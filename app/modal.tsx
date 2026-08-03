@@ -1,35 +1,22 @@
+import { ModalRenderer } from '@/components/modals';
+import { useLocalSearchParams } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { Platform, StyleSheet } from 'react-native';
+import { Platform } from 'react-native';
 
-import EditScreenInfo from '@/components/EditScreenInfo';
-import { Text, View } from '@/components/Themed';
-
+// Экран-обёртка: читает параметры и рендерит нужную модалку
 export default function ModalScreen() {
-  return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Modal</Text>
-      <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
-      <EditScreenInfo path="app/modal.tsx" />
+  const { type, serviceId, message, promoId } = useLocalSearchParams<{
+    type?: string;
+    serviceId?: string;
+    message?: string;
+    promoId?: string;
+  }>();
 
-      {/* Use a light status bar on iOS to account for the black space above the modal */}
+  return (
+    <>
       <StatusBar style={Platform.OS === 'ios' ? 'light' : 'auto'} />
-    </View>
+      <ModalRenderer type={type} serviceId={serviceId} message={message} promoId={promoId} />
+    </>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
-  },
-  separator: {
-    marginVertical: 30,
-    height: 1,
-    width: '80%',
-  },
-});
