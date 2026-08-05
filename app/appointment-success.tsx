@@ -1,8 +1,8 @@
 import { Button } from '@/components/common/Button';
+import { styles } from '@/styles/appointmentSuccess';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { Text, View } from 'react-native';
-import { styles } from './appointment-success.styles';
 
 export default function AppointmentSuccessScreen() {
   return (

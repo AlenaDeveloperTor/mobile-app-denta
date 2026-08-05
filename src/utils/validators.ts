@@ -10,9 +10,9 @@ export function isValidName(name: string): boolean {
   return name.trim().length >= 2;
 }
 
-/** Проверяет код подтверждения (4-6 цифр) */
+/** Проверяет код подтверждения (ровно 4 цифры) */
 export function isValidCode(code: string): boolean {
-  return /^\d{4,6}$/.test(code.trim());
+  return /^\d{4}$/.test(code.trim());
 }
 
 /** Проверяет email по простому правилу */

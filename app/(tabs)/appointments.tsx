@@ -2,10 +2,10 @@ import { AppointmentCard } from '@/components/appointments/AppointmentCard';
 import { Button } from '@/components/common/Button';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
 import { useAppointments } from '@/hooks/useAppointments';
+import { styles } from '@/styles/appointments';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { FlatList, Text, View } from 'react-native';
-import { styles } from './appointments.styles';
 
 export default function AppointmentsScreen() {
   const { appointments, loading, error, refreshing, refresh, cancel } = useAppointments();

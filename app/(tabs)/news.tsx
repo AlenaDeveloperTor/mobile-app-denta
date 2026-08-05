@@ -1,6 +1,6 @@
+import { styles } from '@/styles/news';
 import { Ionicons } from '@expo/vector-icons';
 import { FlatList, Text, View } from 'react-native';
-import { styles } from './news.styles';
 
 interface NewsItem {
   id: string;

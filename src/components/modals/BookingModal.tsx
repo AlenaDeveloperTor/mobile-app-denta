@@ -1,19 +1,19 @@
 import { appointmentsAPI } from '@/api/appointments';
 import { Button } from '@/components/common/Button';
 import { Input } from '@/components/common/Input';
-import { normalizePhone } from '@/utils/formatters';
+import { formatPhoneInput } from '@/utils/formatters';
 import { isValidName, isValidPhone } from '@/utils/validators';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useState } from 'react';
 import {
-    Alert,
-    KeyboardAvoidingView,
-    Platform,
-    ScrollView,
-    Text,
-    TouchableOpacity,
-    View,
+  Alert,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 import { styles } from './BookingModal.styles';
 
@@ -23,7 +23,7 @@ interface BookingModalProps {
 
 export function BookingModal({ serviceId }: BookingModalProps) {
   const [name, setName] = useState('');
-  const [phone, setPhone] = useState('');
+  const [phone, setPhone] = useState('+7');
   const [comment, setComment] = useState('');
   const [agreed, setAgreed] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -85,9 +85,10 @@ export function BookingModal({ serviceId }: BookingModalProps) {
           <Input
             label="Телефон *"
             value={phone}
-            onChangeText={(text) => setPhone(normalizePhone(text))}
+            onChangeText={(text) => setPhone(formatPhoneInput(text))}
             placeholder="+7 (999) 123-45-67"
             keyboardType="phone-pad"
+            maxLength={18}
             error={errors.phone}
           />
           <Input

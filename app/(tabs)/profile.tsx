@@ -1,11 +1,11 @@
 import { Button } from '@/components/common/Button';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useLoyaltyStore } from '@/store/useLoyaltyStore';
+import { styles } from '@/styles/profile';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useEffect } from 'react';
 import { Alert, ScrollView, Text, TouchableOpacity, View } from 'react-native';
-import { styles } from './profile.styles';
 
 export default function ProfileScreen() {
   const { user, logout } = useAuthStore();

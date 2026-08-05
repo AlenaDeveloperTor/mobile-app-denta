@@ -6,9 +6,10 @@ interface InputProps {
   value: string;
   onChangeText: (text: string) => void;
   placeholder?: string;
-  keyboardType?: 'default' | 'phone-pad' | 'email-address';
+  keyboardType?: 'default' | 'number-pad' | 'phone-pad' | 'email-address';
   secureTextEntry?: boolean;
   multiline?: boolean;
+  maxLength?: number;
   error?: string;
 }
 
@@ -20,6 +21,7 @@ export const Input = ({
   keyboardType = 'default',
   secureTextEntry = false,
   multiline = false,
+  maxLength,
   error,
 }: InputProps) => {
   return (
@@ -33,6 +35,7 @@ export const Input = ({
         keyboardType={keyboardType}
         secureTextEntry={secureTextEntry}
         multiline={multiline}
+        maxLength={maxLength}
       />
       {error ? <Text style={styles.errorText}>{error}</Text> : null}
     </View>

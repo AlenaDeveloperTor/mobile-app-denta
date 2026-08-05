@@ -1,6 +1,6 @@
 import { authAPI } from '@/api/auth';
 import { setUnauthorizedHandler } from '@/api/client';
-import type { User } from '@/types/user';
+import type { CodeRequestResponse, User } from '@/types/user';
 import { storage } from '@/utils/storage';
 import { create } from 'zustand';
 
@@ -9,7 +9,7 @@ interface AuthState {
   isLoading: boolean;
   isAuthenticated: boolean;
   checkAuth: () => Promise<void>;
-  requestCode: (phone: string) => Promise<void>;
+  requestCode: (phone: string) => Promise<CodeRequestResponse>;
   verifyCode: (phone: string, code: string) => Promise<void>;
   logout: () => Promise<void>;
 }
@@ -34,7 +34,8 @@ export const useAuthStore = create<AuthState>((set) => ({
   },
 
   requestCode: async (phone: string) => {
-    await authAPI.requestCode(phone);
+    const res = await authAPI.requestCode(phone);
+    return res.data;
   },
 
   verifyCode: async (phone: string, code: string) => {

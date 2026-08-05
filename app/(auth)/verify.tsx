@@ -1,11 +1,11 @@
 import { Button } from '@/components/common/Button';
 import { Input } from '@/components/common/Input';
 import { useAuthStore } from '@/store/useAuthStore';
+import { styles } from '@/styles/verify';
 import { isValidCode } from '@/utils/validators';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import { Alert, Text, View } from 'react-native';
-import { styles } from './verify.styles';
 
 export default function VerifyScreen() {
   const { phone } = useLocalSearchParams<{ phone?: string }>();
@@ -42,9 +42,10 @@ export default function VerifyScreen() {
       <Input
         label="Код из SMS"
         value={code}
-        onChangeText={setCode}
+        onChangeText={(text) => setCode(text.replace(/\D/g, '').slice(0, 4))}
         placeholder="0000"
-        keyboardType="phone-pad"
+        keyboardType="number-pad"
+        maxLength={4}
       />
 
       <Button

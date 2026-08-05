@@ -3,12 +3,12 @@ import { BannerCarousel } from '@/components/home/BannerCarousel';
 import { PromoSection } from '@/components/home/PromoSection';
 import { ServiceCard } from '@/components/home/ServiceCard';
 import { useAuthStore } from '@/store/useAuthStore';
+import { styles } from '@/styles/home';
 import type { Banner, Promo, Service } from '@/types/service';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { ActivityIndicator, ScrollView, Text, TouchableOpacity, View } from 'react-native';
-import { styles } from './index.styles';
 
 // ОСНОВНОЙ КОМПОНЕНТ - Главный экран
 export default function HomeScreen() {
