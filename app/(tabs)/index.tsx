@@ -1,10 +1,12 @@
-import { servicesAPI } from '@/api/services';
+import { Button } from '@/components/common/Button';
 import { BannerCarousel } from '@/components/home/BannerCarousel';
 import { PromoSection } from '@/components/home/PromoSection';
-import { ServiceCard } from '@/components/home/ServiceCard';
+import { DEFAULT_BANNERS } from '@/data/banners';
 import { useAuthStore } from '@/store/useAuthStore';
+import { useBookingModalStore } from '@/store/useBookingModalStore';
+import { useMessageStore } from '@/store/useMessageStore';
 import { styles } from '@/styles/home';
-import type { Banner, Promo, Service } from '@/types/service';
+import type { Banner, Promo } from '@/types/service';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
@@ -13,7 +15,10 @@ import { ActivityIndicator, ScrollView, Text, TouchableOpacity, View } from 'rea
 // ОСНОВНОЙ КОМПОНЕНТ - Главный экран
 export default function HomeScreen() {
   const { user } = useAuthStore();
-  const [services, setServices] = useState<Service[]>([]);
+  const openBooking = useBookingModalStore((s) => s.open);
+  const messages = useMessageStore((s) => s.messages);
+  const loadMessages = useMessageStore((s) => s.load);
+  const unreadCount = messages.filter((m) => !m.is_read).length;
   const [banners, setBanners] = useState<Banner[]>([]);
   const [promos, setPromos] = useState<Promo[]>([]);
   const [loading, setLoading] = useState(true);
@@ -25,15 +30,13 @@ export default function HomeScreen() {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const [servicesRes, bannersRes, promosRes] = await Promise.all([
-          servicesAPI.getServices(),
-          servicesAPI.getBanners(),
-          servicesAPI.getPromos(),
-        ]);
-        if (!isMounted) return;
-        setServices(servicesRes.data);
-        setBanners(bannersRes.data);
-        setPromos(promosRes.data);
+        // const [bannersRes, promosRes] = await Promise.all([
+        //   servicesAPI.getBanners(),
+        //   servicesAPI.getPromos(),
+        // ]);
+        // if (!isMounted) return;
+        // setBanners(bannersRes.data);
+        // setPromos(promosRes.data);
       } catch (error) {
         console.error('Error fetching data:', error);
       } finally {
@@ -48,6 +51,13 @@ export default function HomeScreen() {
     };
   }, []);
 
+  // Загрузка уведомлений (для бейджа непрочитанных на колокольчике)
+  useEffect(() => {
+    if (messages.length === 0) {
+      loadMessages();
+    }
+  }, [messages.length, loadMessages]);
+
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
@@ -55,6 +65,9 @@ export default function HomeScreen() {
       </View>
     );
   }
+
+  // Если API ещё не вернул баннеры — показываем заглушки, чтобы карусель работала
+  const carouselBanners = banners.length > 0 ? banners : DEFAULT_BANNERS;
 
   return (
     <ScrollView 
@@ -69,32 +82,39 @@ export default function HomeScreen() {
             {user?.first_name || 'Пациент'} {user?.last_name || ''}!
           </Text>
         </View>
-        <TouchableOpacity 
-          style={styles.profileIcon}
-          onPress={() => router.push('/profile')}
-        >
-          <Ionicons name="person-circle-outline" size={44} color="#007AFF" />
-        </TouchableOpacity>
+        <View style={styles.headerActions}>
+          {/* Колокольчик уведомлений с бейджем непрочитанных */}
+          <TouchableOpacity
+            style={styles.bellIcon}
+            onPress={() => router.push('/notifications')}
+            hitSlop={8}
+          >
+            <Ionicons name="notifications-outline" size={28} color="#007AFF" />
+            {unreadCount > 0 && (
+              <View style={styles.badge}>
+                <Text style={styles.badgeText}>{unreadCount > 9 ? '9+' : unreadCount}</Text>
+              </View>
+            )}
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.profileIcon}
+            onPress={() => router.push('/profile')}
+          >
+            <Ionicons name="person-circle-outline" size={44} color="#007AFF" />
+          </TouchableOpacity>
+        </View>
       </View>
 
       {/* Баннер-карусель */}
-      <BannerCarousel banners={banners} />
+      <BannerCarousel banners={carouselBanners} />
 
-      {/* Акции */}
-      <PromoSection promos={promos} />
-
-      {/* Услуги */}
-      <View style={styles.servicesSection}>
-        <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>📋 Наши услуги</Text>
-          <TouchableOpacity>
-            <Text style={styles.seeAllText}>Смотреть все</Text>
-          </TouchableOpacity>
-        </View>
-        {services.map((service) => (
-          <ServiceCard key={service.id} service={service} />
-        ))}
+      {/* Кнопка «Записаться» — прилипает к карусели, открывает модалку записи */}
+      <View style={styles.bookSection}>
+        <Button title="✏️ Записаться" onPress={() => openBooking()} />
       </View>
+
+      {/* Акции (раздел скрывается, если акций нет) */}
+      <PromoSection promos={promos} />
 
       {/* Отступ внизу для удобства прокрутки */}
       <View style={styles.bottomPadding} />

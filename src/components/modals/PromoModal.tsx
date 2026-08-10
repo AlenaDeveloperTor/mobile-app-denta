@@ -1,4 +1,5 @@
 import { Button } from '@/components/common/Button';
+import { useBookingModalStore } from '@/store/useBookingModalStore';
 import { router } from 'expo-router';
 import { Text, View } from 'react-native';
 import { styles } from './PromoModal.styles';
@@ -29,6 +30,12 @@ const PROMOS: Promo[] = [
 
 export function PromoModal({ promoId }: PromoModalProps) {
   const promo = PROMOS.find((p) => p.id === promoId) ?? PROMOS[0];
+  const openBooking = useBookingModalStore((s) => s.open);
+
+  const handleBook = () => {
+    router.back(); // закрываем модалку акции
+    openBooking(); // открываем глобальную модалку записи
+  };
 
   return (
     <View style={styles.modalContainer}>
@@ -37,10 +44,7 @@ export function PromoModal({ promoId }: PromoModalProps) {
         <Text style={styles.promoTitle}>{promo.title}</Text>
         <Text style={styles.promoDescription}>{promo.description}</Text>
 
-        <Button
-          title="Записаться"
-          onPress={() => router.push({ pathname: '/modal', params: { type: 'booking' } })}
-        />
+        <Button title="Записаться" onPress={handleBook} />
         <Button title="Закрыть" variant="secondary" onPress={() => router.back()} />
       </View>
     </View>

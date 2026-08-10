@@ -1,5 +1,5 @@
+import { useBookingModalStore } from '@/store/useBookingModalStore';
 import type { Banner } from '@/types/service';
-import { router } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
 import { Dimensions, FlatList, Image, Text, TouchableOpacity, View } from 'react-native';
 import { styles } from './BannerCarousel.styles';
@@ -12,6 +12,7 @@ interface BannerCarouselProps {
 
 export function BannerCarousel({ banners }: BannerCarouselProps) {
   const [activeIndex, setActiveIndex] = useState(0);
+  const openBooking = useBookingModalStore((s) => s.open);
   const flatListRef = useRef<FlatList<Banner>>(null);
 
   // Автопрокрутка каждые 5 секунд
@@ -32,14 +33,15 @@ export function BannerCarousel({ banners }: BannerCarouselProps) {
   }
 
   const handleBannerPress = () => {
-    router.push({
-      pathname: '/modal',
-      params: { type: 'booking' },
-    });
+    openBooking();
   };
 
   const renderBanner = ({ item }: { item: Banner }) => (
-    <TouchableOpacity style={styles.bannerSlide} onPress={handleBannerPress} activeOpacity={0.9}>
+    <TouchableOpacity
+      style={[styles.bannerSlide, { backgroundColor: item.bg_color ?? '#007AFF' }]}
+      onPress={handleBannerPress}
+      activeOpacity={0.9}
+    >
       <Image source={{ uri: item.image_url }} style={styles.bannerImage} resizeMode="cover" />
       <View style={styles.bannerOverlay}>
         <View style={styles.bannerTextContainer}>

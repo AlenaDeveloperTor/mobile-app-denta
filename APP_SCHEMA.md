@@ -18,7 +18,8 @@ mobile-app-denta/
 │   ├── (auth)/                 # Группа авторизации
 │   │   ├── _layout.tsx
 │   │   ├── phone.tsx           # Ввод телефона
-│   │   └── verify.tsx          # Ввод SMS-кода
+│   │   ├── max-link.tsx        # Переход в MAX (диплинк на бота)
+│   │   └── verify.tsx          # Ввод кода из MAX
 │   └── (tabs)/                 # Основные вкладки
 │       ├── _layout.tsx         # Tabs (4 вкладки)
 │       ├── index.tsx           # Главная (услуги, баннеры, акции)
@@ -27,8 +28,8 @@ mobile-app-denta/
 │       └── profile.tsx         # Профиль
 ├── src/
 │   ├── api/                    # HTTP-слой (axios)
-│   │   ├── client.ts           # Экземпляр axios + перехватчики (401, токен)
-│   │   ├── auth.ts             # authAPI: requestCode / verifyCode / getProfile
+│   │   ├── client.ts           # Экземпляр axios + перехватчики (токен, auto-refresh при 401)
+│   │   ├── auth.ts             # authAPI: requestCode / verifyCode / refresh / getProfile
 │   │   ├── services.ts         # servicesAPI: услуги, баннеры, акции
 │   │   ├── appointments.ts     # appointmentsAPI: список / создание / отмена
 │   │   ├── loyalty.ts          # loyaltyAPI: баланс / история
@@ -56,8 +57,9 @@ mobile-app-denta/
 | Файл / компонент | Ответственность |
 |---|---|
 | `app/_layout.tsx` | Корневой `Stack`. При старте вызывает `checkAuth()`, показывает спиннер пока `isLoading`. ⚠️ Редирект неавторизованного на `/(auth)/phone` ещё не реализован — TODO. |
-| `app/(auth)/phone.tsx` | Ввод телефона → `requestCode(phone)` → переход на `verify`. |
-| `app/(auth)/verify.tsx` | Ввод SMS-кода → `verifyCode(phone, code)` → `router.replace('/(tabs)')`. |
+| `app/(auth)/phone.tsx` | Ввод телефона → `requestCode(phone)`. При `status='need_redirect'` → `max-link`, иначе → `verify`. |
+| `app/(auth)/max-link.tsx` | «Подтвердите номер в MAX»: диплинк на бота, «Продолжить» → `verify` (передаёт `session_id`). |
+| `app/(auth)/verify.tsx` | Ввод кода из MAX → `verifyCode(session_id, code)` → `router.replace('/(tabs)')`. |
 | `app/(tabs)/index.tsx` | Главная: приветствие, `BannerCarousel`, `PromoSection`, список `ServiceCard`. Данные через `servicesAPI`. |
 | `app/(tabs)/appointments.tsx` | Список записей через хук `useAppointments`, пустые/ошибочные состояния, pull-to-refresh, отмена записи. |
 | `app/(tabs)/news.tsx` | Лента новостей (сейчас статический массив). |
@@ -74,7 +76,7 @@ mobile-app-denta/
 | `src/components/common/Button.tsx` | Кнопка (variants, loading, disabled, style). |
 | `src/components/common/Input.tsx` | Поле ввода с label/error/multiline. |
 | `src/components/common/Card.tsx`, `LoadingSpinner.tsx` | Карточка-контейнер и спиннер. |
-| `src/api/client.ts` | Axios: baseURL из `env`, подстановка Bearer-токена, обработка 401 (`setUnauthorizedHandler`), `getErrorMessage`. |
+| `src/api/client.ts` | Axios: baseURL из `env`, подстановка Bearer-токена, авто-обновление токена при 401 (single-flight) + `setUnauthorizedHandler`, `getErrorMessage`. |
 | `src/store/useAuthStore.tsx` | user / isAuthenticated / isLoading; `checkAuth`, `requestCode`, `verifyCode`, `logout`; сброс сессии при 401. |
 | `src/store/useAppointmentStore.ts` | Состояние списка записей. |
 | `src/store/useLoyaltyStore.ts` | Бонусный баланс и история. |
@@ -89,8 +91,11 @@ flowchart TD
     A[Запуск приложения] --> B{_layout: checkAuth}
     B -->|нет токена| C[/(auth)/phone]
     B -->|есть токен| G[/(tabs) Главная]
-    C -->|ввод телефона| D[/(auth)/verify]
-    D -->|ввод SMS-кода| E{verifyCode}
+    C -->|ввод телефона| C1{requestCode}
+    C1 -->|need_redirect| D1[/(auth)/max-link]
+    C1 -->|sent_to_max| D[/(auth)/verify]
+    D1 -->|Продолжить| D
+    D -->|ввод кода из MAX| E{verifyCode}
     E -->|успех| F["записать токен + user в store"]
     F --> G
     G -->|тап по услуге| H["/modal?type=booking&serviceId=..."]
@@ -106,7 +111,7 @@ flowchart TD
 
 **Ключевые сценарии UX:**
 
-1. **Авторизация** — телефон → SMS-код → токен в `AsyncStorage` (`access_token`), пользователь в `useAuthStore`. После входа — вкладки.
+1. **Авторизация (через MAX, без SMS)** — телефон → `POST /auth/request-code` → сервер возвращает `session_id` + `status`. Если `need_redirect` — пользователь открывает бота MAX по диплинку и получает код в чат; если `sent_to_max` — код уже отправлен. Затем `POST /auth/verify-code` c `{session_id, code}` → пара токенов `access_token` + `refresh_token` в `AsyncStorage` (`STORAGE_KEYS`), пользователь в `useAuthStore`. При 401 клиент автоматически обновляет токен через `POST /auth/refresh`.
 2. **Запись к врачу** — с Главной (услуга/акция) → модалка `booking` → валидация → `POST /appointments` → экран успеха → возврат на Главную.
 3. **Управление записями** — вкладка «Мои записи»: список, статусы (pending/confirmed/cancelled/completed), отмена, pull-to-refresh.
 4. **Профиль и бонусы** — баланс лояльности, выход из аккаунта.
@@ -123,7 +128,8 @@ flowchart TD
 | `/(tabs)/news` | Новости | Вкладка «Новости» |
 | `/(tabs)/profile` | Профиль | Вкладка «Профиль» |
 | `/(auth)/phone` | Вход | Группа (auth) — без табов |
-| `/(auth)/verify` | Код | Параметр `phone` |
+| `/(auth)/max-link` | Подтверждение в MAX | Параметры: `phone`, `deep_link`, `session_id` |
+| `/(auth)/verify` | Код | Параметры: `phone`, `session_id` |
 | `/modal` | Модалка | Параметры: `type`, `serviceId`, `message`, `promoId` |
 | `/appointment-success` | Успех записи | После создания записи |
 

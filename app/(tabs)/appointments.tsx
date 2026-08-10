@@ -2,13 +2,14 @@ import { AppointmentCard } from '@/components/appointments/AppointmentCard';
 import { Button } from '@/components/common/Button';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
 import { useAppointments } from '@/hooks/useAppointments';
+import { useBookingModalStore } from '@/store/useBookingModalStore';
 import { styles } from '@/styles/appointments';
 import { Ionicons } from '@expo/vector-icons';
-import { router } from 'expo-router';
 import { FlatList, Text, View } from 'react-native';
 
 export default function AppointmentsScreen() {
   const { appointments, loading, error, refreshing, refresh, cancel } = useAppointments();
+  const openBooking = useBookingModalStore((s) => s.open);
 
   if (loading && appointments.length === 0) {
     return <LoadingSpinner />;
@@ -22,7 +23,7 @@ export default function AppointmentsScreen() {
         <Text style={styles.emptyText}>
           Запишитесь к врачу, чтобы видеть свои визиты здесь
         </Text>
-        <Button title="Записаться" onPress={() => router.push('/')} />
+        <Button title="Записаться" onPress={() => openBooking()} />
       </View>
     );
   }

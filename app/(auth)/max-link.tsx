@@ -6,7 +6,11 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { Linking, Text, View } from 'react-native';
 
 export default function MaxLinkScreen() {
-  const { phone, deep_link } = useLocalSearchParams<{ phone?: string; deep_link?: string }>();
+  const { phone, deep_link, session_id } = useLocalSearchParams<{
+    phone?: string;
+    deep_link?: string;
+    session_id?: string;
+  }>();
   // Ссылка от сервера, либо запасная из .env
   const botLink = deep_link && deep_link.length > 0 ? deep_link : MAX_BOT_DEEP_LINK;
 
@@ -24,7 +28,7 @@ export default function MaxLinkScreen() {
   const continueToVerify = () => {
     router.push({
       pathname: '/(auth)/verify',
-      params: { phone: phone ?? '' },
+      params: { phone: phone ?? '', session_id: session_id ?? '' },
     });
   };
 

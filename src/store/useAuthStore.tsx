@@ -10,7 +10,7 @@ interface AuthState {
   isAuthenticated: boolean;
   checkAuth: () => Promise<void>;
   requestCode: (phone: string) => Promise<CodeRequestResponse>;
-  verifyCode: (phone: string, code: string) => Promise<void>;
+  verifyCode: (sessionId: string, code: string) => Promise<void>;
   logout: () => Promise<void>;
 }
 
@@ -27,7 +27,7 @@ export const useAuthStore = create<AuthState>((set) => ({
         set({ user: res.data, isAuthenticated: true });
       }
     } catch {
-      await storage.removeToken();
+      await storage.removeTokens();
     } finally {
       set({ isLoading: false });
     }
@@ -38,20 +38,20 @@ export const useAuthStore = create<AuthState>((set) => ({
     return res.data;
   },
 
-  verifyCode: async (phone: string, code: string) => {
-    const res = await authAPI.verifyCode(phone, code);
-    await storage.setToken(res.data.token);
+  verifyCode: async (sessionId: string, code: string) => {
+    const res = await authAPI.verifyCode(sessionId, code);
+    await storage.setTokens(res.data.access_token, res.data.refresh_token);
     set({ user: res.data.user, isAuthenticated: true });
   },
 
   logout: async () => {
-    await storage.removeToken();
+    await storage.removeTokens();
     set({ user: null, isAuthenticated: false });
   },
 }));
 
 // При получении 401 от API сбрасываем сессию
 setUnauthorizedHandler(() => {
-  storage.removeToken();
+  storage.removeTokens();
   useAuthStore.setState({ user: null, isAuthenticated: false });
 });

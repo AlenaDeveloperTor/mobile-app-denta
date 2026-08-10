@@ -23,14 +23,27 @@ export default function PhoneScreen() {
     setLoading(true);
     try {
       const res = await requestCode(normalized);
-      // Сервер просит сначала привязать телефон через бота в MAX
-      if (res.needs_link) {
+      if (res.message) {
+        Alert.alert('', res.message);
+      }
+      // Новый пользователь — нужно перейти в MAX по диплинку
+      if (res.status === 'need_redirect') {
         router.push({
           pathname: '/(auth)/max-link',
-          params: { phone: normalized, deep_link: res.deep_link ?? '' },
+          params: {
+            phone: normalized,
+            session_id: res.session_id,
+            deep_link: res.deep_link ?? '',
+          },
         });
         return;
       }
+      // Код уже отправлен в чат MAX — идём на экран ввода кода
+      router.push({
+        pathname: '/(auth)/verify',
+        params: { phone: normalized, session_id: res.session_id },
+      });
+      return;
     } catch (error) {
       // В продакшене при неудаче показываем ошибку и не идём дальше
       if (!__DEV__) {
@@ -47,11 +60,6 @@ export default function PhoneScreen() {
     } finally {
       setLoading(false);
     }
-
-    router.push({
-      pathname: '/(auth)/verify',
-      params: { phone: normalized },
-    });
   };
 
   return (

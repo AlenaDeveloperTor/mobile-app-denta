@@ -34,25 +34,35 @@ export const styles = StyleSheet.create({
   profileIcon: {
     padding: 4,
   },
-  servicesSection: {
-    paddingHorizontal: 20,
-    paddingTop: 10,
-  },
-  sectionHeader: {
+  headerActions: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 15,
+    gap: 6,
   },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#1A1A2E',
+  bellIcon: {
+    padding: 4,
   },
-  seeAllText: {
-    fontSize: 14,
-    color: '#007AFF',
-    fontWeight: '500',
+  badge: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    minWidth: 18,
+    height: 18,
+    borderRadius: 9,
+    backgroundColor: '#FF3B30',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 4,
+  },
+  badgeText: {
+    color: '#FFFFFF',
+    fontSize: 11,
+    fontWeight: '700',
+  },
+  bookSection: {
+    paddingHorizontal: 20,
+    marginTop: -12,
+    marginBottom: 10,
   },
   bottomPadding: {
     height: 30,

@@ -1,51 +1,102 @@
 import { appointmentsAPI } from '@/api/appointments';
+import { servicesAPI } from '@/api/services';
 import { Button } from '@/components/common/Button';
 import { Input } from '@/components/common/Input';
-import { formatPhoneInput } from '@/utils/formatters';
-import { isValidName, isValidPhone } from '@/utils/validators';
-import { Ionicons } from '@expo/vector-icons';
-import { router } from 'expo-router';
-import { useState } from 'react';
+import { DEFAULT_SERVICES } from '@/data/services';
 import {
-  Alert,
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
-  Text,
-  TouchableOpacity,
-  View,
+    bookingBlurTargetRef,
+    useBookingModalStore,
+} from '@/store/useBookingModalStore';
+import type { Service } from '@/types/service';
+import { formatDuration, formatPhoneInput, formatPrice } from '@/utils/formatters';
+import { isValidPhone } from '@/utils/validators';
+import { Ionicons } from '@expo/vector-icons';
+import { BlurView } from 'expo-blur';
+import { router } from 'expo-router';
+import { useEffect, useState } from 'react';
+import {
+    ActivityIndicator,
+    Alert,
+    KeyboardAvoidingView,
+    Platform,
+    Pressable,
+    ScrollView,
+    Text,
+    TouchableOpacity,
+    View,
 } from 'react-native';
 import { styles } from './BookingModal.styles';
 
-interface BookingModalProps {
-  serviceId?: string;
-}
+/**
+ * Глобальная модалка записи к врачу.
+ * Рендерится в корневом layout поверх всех экранов, приглушает фон
+ * полупрозрачной подложкой + блюром (expo-blur).
+ * Внутри: выбор услуги, телефон, комментарий и кнопка «Подтвердить».
+ */
+export function BookingModal() {
+  const { isOpen, initialServiceId, close } = useBookingModalStore();
 
-export function BookingModal({ serviceId }: BookingModalProps) {
-  const [name, setName] = useState('');
+  const [services, setServices] = useState<Service[]>([]);
+  const [servicesLoading, setServicesLoading] = useState(false);
+  const [selectedServiceId, setSelectedServiceId] = useState<string | undefined>();
   const [phone, setPhone] = useState('+7');
   const [comment, setComment] = useState('');
-  const [agreed, setAgreed] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  const [errors, setErrors] = useState<{ name?: string; phone?: string; agreed?: string }>({});
+  const [errors, setErrors] = useState<{ service?: string; phone?: string }>({});
+
+  // Загрузка списка услуг при первом открытии
+  useEffect(() => {
+    let active = true;
+    setServicesLoading(true);
+    servicesAPI
+      .getServices()
+      .then((res) => {
+        if (!active) return;
+        // Если API вернул пустой список — показываем демо-услуги
+        const items = res.data.length > 0 ? res.data : DEFAULT_SERVICES;
+        setServices(items);
+        if (items[0]) {
+          setSelectedServiceId((prev) => prev ?? items[0].id);
+        }
+      })
+      .catch(() => {
+        // Если API недоступен — тоже показываем демо-услуги для теста
+        if (!active) return;
+        setServices(DEFAULT_SERVICES);
+        setSelectedServiceId((prev) => prev ?? DEFAULT_SERVICES[0]?.id);
+      })
+      .finally(() => {
+        if (active) setServicesLoading(false);
+      });
+    return () => {
+      active = false;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Сброс формы при каждом открытии
+  useEffect(() => {
+    if (!isOpen) return;
+    setPhone('+7');
+    setComment('');
+    setErrors({});
+    setSelectedServiceId(initialServiceId ?? services[0]?.id);
+  }, [isOpen, initialServiceId, services]);
 
   const validate = () => {
     const next: typeof errors = {};
-    if (!isValidName(name)) {
-      next.name = 'Укажите имя (минимум 2 символа)';
+    if (!selectedServiceId) {
+      next.service = 'Выберите услугу';
     }
     if (!isValidPhone(phone)) {
       next.phone = 'Укажите корректный номер телефона';
-    }
-    if (!agreed) {
-      next.agreed = 'Необходимо согласие на обработку данных';
     }
     setErrors(next);
     return Object.keys(next).length === 0;
   };
 
-  const handleBooking = async () => {
-    if (!validate()) {
+  const handleConfirm = async () => {
+    if (!validate() || !selectedServiceId) {
       return;
     }
 
@@ -53,11 +104,12 @@ export function BookingModal({ serviceId }: BookingModalProps) {
     try {
       // В реальном приложении дата/время выбираются пользователем
       await appointmentsAPI.create({
-        service_id: serviceId ?? '',
+        service_id: selectedServiceId,
         date: new Date().toISOString().slice(0, 10),
         time: '10:00',
         comment: comment.trim() || undefined,
       });
+      close();
       router.replace('/appointment-success');
     } catch {
       Alert.alert('Ошибка', 'Не удалось создать запись. Попробуйте позже.');
@@ -66,53 +118,114 @@ export function BookingModal({ serviceId }: BookingModalProps) {
     }
   };
 
+  if (!isOpen) {
+    return null;
+  }
+
   return (
-    <KeyboardAvoidingView
-      style={styles.modalContainer}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-    >
-      <View style={styles.modalContent}>
-        <ScrollView showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
-          <Text style={styles.modalTitle}>✏️ Запись к врачу</Text>
+    <View style={styles.overlay}>
+      <BlurView
+        blurTarget={bookingBlurTargetRef}
+        blurMethod="dimezisBlurViewSdk31Plus"
+        intensity={30}
+        tint="dark"
+        style={styles.backdrop}
+      >
+        {/* Подложка: тап вне карточки закрывает модалку */}
+        <Pressable style={styles.backdropPressable} onPress={close} />
 
-          <Input
-            label="ФИО *"
-            value={name}
-            onChangeText={setName}
-            placeholder="Иванов Иван Иванович"
-            error={errors.name}
-          />
-          <Input
-            label="Телефон *"
-            value={phone}
-            onChangeText={(text) => setPhone(formatPhoneInput(text))}
-            placeholder="+7 (999) 123-45-67"
-            keyboardType="phone-pad"
-            maxLength={18}
-            error={errors.phone}
-          />
-          <Input
-            label="Комментарий"
-            value={comment}
-            onChangeText={setComment}
-            placeholder="Дополнительные пожелания"
-            multiline
-          />
+        <KeyboardAvoidingView
+          style={styles.modalPositioner}
+          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+          pointerEvents="box-none"
+        >
+          <View style={styles.modalCard}>
+            <ScrollView
+              showsVerticalScrollIndicator={false}
+              keyboardShouldPersistTaps="handled"
+            >
+              <View style={styles.header}>
+                <Text style={styles.title}>✏️ Запись к врачу</Text>
+                <TouchableOpacity onPress={close} style={styles.closeButton} hitSlop={10}>
+                  <Ionicons name="close" size={24} color="#666" />
+                </TouchableOpacity>
+              </View>
 
-          <TouchableOpacity style={styles.checkboxContainer} onPress={() => setAgreed(!agreed)}>
-            <Ionicons name={agreed ? 'checkbox' : 'square-outline'} size={24} color="#007AFF" />
-            <Text style={styles.checkboxText}>Я согласен с условиями обработки данных</Text>
-          </TouchableOpacity>
-          {errors.agreed ? <Text style={styles.errorText}>{errors.agreed}</Text> : null}
+              {/* Выбор услуги */}
+              <Text style={styles.label}>Вид услуги *</Text>
+              {servicesLoading ? (
+                <View style={styles.loadingContainer}>
+                  <ActivityIndicator color="#007AFF" />
+                </View>
+              ) : (
+                <View style={styles.serviceList}>
+                  {services.map((service) => {
+                    const selected = service.id === selectedServiceId;
+                    return (
+                      <TouchableOpacity
+                        key={service.id}
+                        style={[
+                          styles.serviceItem,
+                          selected && styles.serviceItemSelected,
+                        ]}
+                        onPress={() => setSelectedServiceId(service.id)}
+                        activeOpacity={0.8}
+                      >
+                        <View style={styles.serviceInfo}>
+                          <Text style={styles.serviceName}>{service.name}</Text>
+                          <Text style={styles.serviceMeta}>
+                            {formatDuration(service.duration)} · от{' '}
+                            {formatPrice(service.price)}
+                          </Text>
+                        </View>
+                        <Ionicons
+                          name={
+                            selected ? 'radio-button-on' : 'radio-button-off'
+                          }
+                          size={22}
+                          color={selected ? '#007AFF' : '#C7C7CC'}
+                        />
+                      </TouchableOpacity>
+                    );
+                  })}
+                  {!servicesLoading && services.length === 0 && (
+                    <Text style={styles.emptyText}>Список услуг пока пуст</Text>
+                  )}
+                </View>
+              )}
+              {errors.service ? (
+                <Text style={styles.errorText}>{errors.service}</Text>
+              ) : null}
 
-          <Button
-            title={submitting ? 'Отправка...' : 'Записаться'}
-            onPress={handleBooking}
-            loading={submitting}
-          />
-          <Button title="Отмена" variant="secondary" onPress={() => router.back()} />
-        </ScrollView>
-      </View>
-    </KeyboardAvoidingView>
+              <Input
+                label="Телефон *"
+                value={phone}
+                onChangeText={(text) => setPhone(formatPhoneInput(text))}
+                placeholder="+7 (999) 123-45-67"
+                keyboardType="phone-pad"
+                maxLength={18}
+                error={errors.phone}
+              />
+              <Input
+                label="Комментарий"
+                value={comment}
+                onChangeText={setComment}
+                placeholder="Дополнительные пожелания"
+                multiline
+              />
+
+              <Button
+                title={submitting ? 'Отправка...' : 'Подтвердить'}
+                onPress={handleConfirm}
+                loading={submitting}
+              />
+              <View style={styles.cancelButton}>
+                <Button title="Отмена" variant="secondary" onPress={close} />
+              </View>
+            </ScrollView>
+          </View>
+        </KeyboardAvoidingView>
+      </BlurView>
+    </View>
   );
 }

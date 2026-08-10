@@ -5,6 +5,7 @@ export const APP_VERSION = '1.0.0';
 /** Ключи AsyncStorage */
 export const STORAGE_KEYS = {
   ACCESS_TOKEN: 'access_token',
+  REFRESH_TOKEN: 'refresh_token',
   USER: 'user',
   FCM_TOKEN: 'fcm_token',
 } as const;

@@ -3,32 +3,20 @@ import { router } from 'expo-router';
 import { Text, TouchableOpacity, View } from 'react-native';
 import { styles } from './PromoSection.styles';
 
-const DEFAULT_PROMOS: Promo[] = [
-  {
-    id: 'default-1',
-    title: '🔥 Скидка 20% на имплантацию',
-    description: 'До 31 августа. Запишитесь на консультацию уже сегодня!',
-    button_text: 'Узнать больше',
-  },
-  {
-    id: 'default-2',
-    title: '⭐ Бесплатная диагностика',
-    description: 'При первом посещении клиники - КТ и 3D-снимок в подарок',
-    button_text: 'Записаться',
-  },
-];
-
 interface PromoSectionProps {
   promos: Promo[];
 }
 
 export function PromoSection({ promos }: PromoSectionProps) {
-  const items = promos.length > 0 ? promos : DEFAULT_PROMOS;
+  // Если акций нет — секцию не показываем вообще
+  if (promos.length === 0) {
+    return null;
+  }
 
   return (
     <View style={styles.promoSection}>
       <Text style={styles.sectionTitle}>🔥 Акции</Text>
-      {items.map((promo) => (
+      {promos.map((promo) => (
         <TouchableOpacity
           key={promo.id}
           style={styles.promoCard}

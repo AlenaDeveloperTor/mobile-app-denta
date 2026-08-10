@@ -7,12 +7,21 @@ export const storage = {
     return AsyncStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
   },
 
-  async setToken(token: string): Promise<void> {
-    await AsyncStorage.setItem(STORAGE_KEYS.ACCESS_TOKEN, token);
+  async getRefreshToken(): Promise<string | null> {
+    return AsyncStorage.getItem(STORAGE_KEYS.REFRESH_TOKEN);
   },
 
-  async removeToken(): Promise<void> {
-    await AsyncStorage.removeItem(STORAGE_KEYS.ACCESS_TOKEN);
+  /** Сохраняет пару токенов (access + refresh) */
+  async setTokens(accessToken: string, refreshToken: string): Promise<void> {
+    await AsyncStorage.multiSet([
+      [STORAGE_KEYS.ACCESS_TOKEN, accessToken],
+      [STORAGE_KEYS.REFRESH_TOKEN, refreshToken],
+    ]);
+  },
+
+  /** Удаляет пару токенов */
+  async removeTokens(): Promise<void> {
+    await AsyncStorage.multiRemove([STORAGE_KEYS.ACCESS_TOKEN, STORAGE_KEYS.REFRESH_TOKEN]);
   },
 
   async getItem(key: string): Promise<string | null> {
