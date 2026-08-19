@@ -1,4 +1,5 @@
 import { appointmentsAPI } from '@/api/appointments';
+import { getErrorMessage } from '@/api/client';
 import { servicesAPI } from '@/api/services';
 import { Button } from '@/components/common/Button';
 import { Input } from '@/components/common/Input';
@@ -8,7 +9,7 @@ import {
     useBookingModalStore,
 } from '@/store/useBookingModalStore';
 import type { Service } from '@/types/service';
-import { formatDuration, formatPhoneInput, formatPrice } from '@/utils/formatters';
+import { formatDuration, formatPhoneInput, formatPrice, normalizePhone } from '@/utils/formatters';
 import { isValidPhone } from '@/utils/validators';
 import { Ionicons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
@@ -102,17 +103,18 @@ export function BookingModal() {
 
     setSubmitting(true);
     try {
-      // В реальном приложении дата/время выбираются пользователем
       await appointmentsAPI.create({
-        service_id: selectedServiceId,
-        date: new Date().toISOString().slice(0, 10),
-        time: '10:00',
-        comment: comment.trim() || undefined,
+        service_id: Number(selectedServiceId),
+        phone: normalizePhone(phone),
+        comment: comment.trim() || '',
       });
       close();
       router.replace('/appointment-success');
-    } catch {
-      Alert.alert('Ошибка', 'Не удалось создать запись. Попробуйте позже.');
+    } catch (error) {
+      Alert.alert(
+        'Ошибка',
+        getErrorMessage(error, 'Не удалось создать запись. Попробуйте позже.')
+      );
     } finally {
       setSubmitting(false);
     }

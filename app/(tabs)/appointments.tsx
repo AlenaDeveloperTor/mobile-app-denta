@@ -33,9 +33,9 @@ export default function AppointmentsScreen() {
       style={styles.list}
       contentContainerStyle={styles.listContent}
       data={appointments}
-      keyExtractor={(item) => item.id}
+      keyExtractor={(item) => String(item.id)}
       renderItem={({ item }) => (
-        <AppointmentCard appointment={item} onCancel={() => cancel(item.id)} />
+        <AppointmentCard appointment={item} onCancel={() => cancel(String(item.id))} />
       )}
       refreshing={refreshing}
       onRefresh={refresh}
