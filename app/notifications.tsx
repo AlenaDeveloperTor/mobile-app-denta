@@ -3,18 +3,31 @@ import { MessageCard } from '@/components/messages/MessageCard';
 import { useMessageStore } from '@/store/useMessageStore';
 import { styles } from '@/styles/notifications';
 import { Ionicons } from '@expo/vector-icons';
-import { router } from 'expo-router';
-import { useEffect } from 'react';
+import { router, useLocalSearchParams } from 'expo-router';
+import { useEffect, useRef } from 'react';
 import { FlatList, Text, TouchableOpacity, View } from 'react-native';
 
 export default function NotificationsScreen() {
   const { messages, loading, load, markAsRead, markAllRead } = useMessageStore();
+  const { messageId } = useLocalSearchParams<{ messageId?: string }>();
+  const openedMessageId = useRef<string | null>(null);
 
   useEffect(() => {
     if (messages.length === 0) {
       load();
     }
   }, [messages.length, load]);
+
+  useEffect(() => {
+    if (!messageId || loading || messages.length === 0 || openedMessageId.current === messageId) {
+      return;
+    }
+
+    if (messages.some(message => message.id === messageId)) {
+      openedMessageId.current = messageId;
+      openMessage(messageId);
+    }
+  }, [loading, messageId, messages]);
 
   const openMessage = (id: string) => {
     markAsRead(id);
@@ -28,17 +41,15 @@ export default function NotificationsScreen() {
     return <LoadingSpinner />;
   }
 
-  const hasUnread = messages.some((m) => !m.is_read);
+  const hasUnread = messages.some(m => !m.is_read);
 
   return (
     <FlatList
       style={styles.list}
       contentContainerStyle={styles.listContent}
       data={messages}
-      keyExtractor={(item) => item.id}
-      renderItem={({ item }) => (
-        <MessageCard message={item} onPress={() => openMessage(item.id)} />
-      )}
+      keyExtractor={item => item.id}
+      renderItem={({ item }) => <MessageCard message={item} onPress={() => openMessage(item.id)} />}
       ListHeaderComponent={
         <View style={styles.header}>
           <Text style={styles.headerTitle}>Уведомления</Text>
