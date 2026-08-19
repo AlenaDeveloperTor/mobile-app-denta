@@ -1,5 +1,6 @@
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
 import { BookingModal } from '@/components/modals/BookingModal';
+import { usePushNotifications } from '@/hooks/userPushNotifications';
 import { useAuthStore } from '@/store/useAuthStore';
 import { bookingBlurTargetRef } from '@/store/useBookingModalStore';
 import { BlurTargetView } from 'expo-blur';
@@ -10,6 +11,7 @@ import { View } from 'react-native';
 export default function RootLayout() {
   const { isLoading, isAuthenticated, checkAuth } = useAuthStore();
 
+  usePushNotifications(isAuthenticated);
   useEffect(() => {
     checkAuth(); // Проверяем, есть ли сохраненный токен
   }, [checkAuth]);
@@ -27,7 +29,10 @@ export default function RootLayout() {
             <Stack.Screen name="(tabs)" />
             <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
             <Stack.Screen name="appointment-success" />
-            <Stack.Screen name="notifications" options={{ headerShown: true, title: 'Уведомления' }} />
+            <Stack.Screen
+              name="notifications"
+              options={{ headerShown: true, title: 'Уведомления' }}
+            />
           </Stack.Protected>
           <Stack.Protected guard={!isAuthenticated}>
             <Stack.Screen name="(auth)" />
@@ -39,4 +44,3 @@ export default function RootLayout() {
     </View>
   );
 }
-

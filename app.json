@@ -10,17 +10,33 @@
       "supportsTablet": true
     },
     "android": {
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "package": "com.anonymous.mobileappdenta",
+      "googleServicesFile": "./android/google-services.json"
     },
     "web": {
       "bundler": "metro",
       "output": "static"
     },
     "plugins": [
-      "expo-router"
+      "expo-router",
+      "@react-native-firebase/app",
+      [
+        "expo-notifications",
+        {
+          "defaultChannel": "default"
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "c275c99b-f1f1-4842-b1f8-d8acb43ab83c"
+      }
+    },
+    "owner": "romchik_programmist"
   }
 }

@@ -7,7 +7,7 @@ export const STORAGE_KEYS = {
   ACCESS_TOKEN: 'access_token',
   REFRESH_TOKEN: 'refresh_token',
   USER: 'user',
-  FCM_TOKEN: 'fcm_token',
+  EXPO_PUSH_TOKEN: 'expo_push_token',
 } as const;
 
 /** Настройки записи к врачу */
