@@ -36,6 +36,10 @@ yarn-error.*
 .env.*
 !.env.example
 
+# Firebase (секретный конфиг — хранится только локально)
+google-services.json
+android/google-services.json
+
 # logs
 *.log
 logs/

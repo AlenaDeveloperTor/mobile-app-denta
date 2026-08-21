@@ -12,7 +12,7 @@
     "android": {
       "predictiveBackGestureEnabled": false,
       "package": "com.romchik_programmist.mobileappdenta",
-      "googleServicesFile": "./android/google-services.json"
+      "googleServicesFile": "./google-services.json"
     },
     "web": {
       "bundler": "metro",
