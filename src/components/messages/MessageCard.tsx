@@ -8,10 +8,9 @@ const CATEGORY_ICONS: Record<
   MessageCategory,
   { name: keyof typeof Ionicons.glyphMap; color: string }
 > = {
-  general: { name: 'notifications', color: '#007AFF' },
   promo: { name: 'pricetag', color: '#FF6B35' },
-  news: { name: 'newspaper', color: '#2E7D32' },
-  appointment: { name: 'calendar', color: '#8E44AD' },
+  system: { name: 'notifications', color: '#007AFF' },
+  info: { name: 'information-circle', color: '#2E7D32' },
 };
 
 interface MessageCardProps {
@@ -20,7 +19,7 @@ interface MessageCardProps {
 }
 
 export function MessageCard({ message, onPress }: MessageCardProps) {
-  const icon = CATEGORY_ICONS[message.category] ?? CATEGORY_ICONS.general;
+  const icon = CATEGORY_ICONS[message.category] ?? CATEGORY_ICONS.system;
   const unread = !message.is_read;
 
   return (

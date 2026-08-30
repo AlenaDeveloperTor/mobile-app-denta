@@ -6,10 +6,10 @@ export interface ApiResponse<T> {
 
 /** Пагинированный ответ API */
 export interface PaginatedResponse<T> {
-  data: T[];
+  items: T[];
   total: number;
   page: number;
-  per_page: number;
+  limit: number;
 }
 
 /** Структура ошибки API */
@@ -20,5 +20,5 @@ export interface ApiError {
 
 export interface PaginationParams {
   page?: number;
-  per_page?: number;
+  limit?: number;
 }

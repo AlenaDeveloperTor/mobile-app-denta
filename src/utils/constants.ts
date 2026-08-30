@@ -8,6 +8,7 @@ export const STORAGE_KEYS = {
   REFRESH_TOKEN: 'refresh_token',
   USER: 'user',
   EXPO_PUSH_TOKEN: 'expo_push_token',
+  DEVICE_ID: 'device_id',
 } as const;
 
 /** Настройки записи к врачу */

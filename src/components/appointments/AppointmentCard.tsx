@@ -1,5 +1,5 @@
 import type { Appointment, AppointmentStatus } from '@/types/appointment';
-import { formatDate } from '@/utils/formatters';
+import { formatDate, formatDateTime } from '@/utils/formatters';
 import { Text, TouchableOpacity, View, type ViewStyle } from 'react-native';
 import { styles } from './AppointmentCard.styles';
 
@@ -28,15 +28,25 @@ const STATUS_STYLES: Record<AppointmentStatus, ViewStyle> = {
 export function AppointmentCard({ appointment, onPress, onCancel }: AppointmentCardProps) {
   const canCancel =
     onCancel && appointment.status !== 'cancelled' && appointment.status !== 'completed';
-  const dateText = appointment.date ? formatDate(appointment.date) : 'По договорённости';
-  const timeText = appointment.time ?? '—';
+
+  // Приоритет: appointment_datetime (единое поле из бэкенда), фоллбэк на устаревшие date/time
+  let dateText: string;
+  let timeText: string;
+
+  if (appointment.appointment_datetime) {
+    dateText = formatDateTime(appointment.appointment_datetime);
+    timeText = '';
+  } else {
+    dateText = appointment.date ? formatDate(appointment.date) : 'По договорённости';
+    timeText = appointment.time ?? '—';
+  }
 
   return (
     <TouchableOpacity style={styles.card} onPress={onPress} activeOpacity={0.8}>
       <View style={styles.header}>
         <View style={styles.dateBox}>
           <Text style={styles.dateDay}>{dateText}</Text>
-          <Text style={styles.timeText}>{timeText}</Text>
+          {timeText ? <Text style={styles.timeText}>{timeText}</Text> : null}
         </View>
         <View style={[styles.statusBadge, STATUS_STYLES[appointment.status]]}>
           <Text style={styles.statusText}>{STATUS_LABELS[appointment.status]}</Text>

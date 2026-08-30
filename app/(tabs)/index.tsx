@@ -16,9 +16,8 @@ import { ActivityIndicator, ScrollView, Text, TouchableOpacity, View } from 'rea
 export default function HomeScreen() {
   const { user } = useAuthStore();
   const openBooking = useBookingModalStore((s) => s.open);
-  const messages = useMessageStore((s) => s.messages);
-  const loadMessages = useMessageStore((s) => s.load);
-  const unreadCount = messages.filter((m) => !m.is_read).length;
+  const unreadCount = useMessageStore((s) => s.unreadCount);
+  const loadUnreadCount = useMessageStore((s) => s.loadUnreadCount);
   const [banners, setBanners] = useState<Banner[]>([]);
   const [promos, setPromos] = useState<Promo[]>([]);
   const [loading, setLoading] = useState(true);
@@ -51,12 +50,10 @@ export default function HomeScreen() {
     };
   }, []);
 
-  // Загрузка уведомлений (для бейджа непрочитанных на колокольчике)
+  // Загрузка счётчика непрочитанных (для бейджа на колокольчике)
   useEffect(() => {
-    if (messages.length === 0) {
-      loadMessages();
-    }
-  }, [messages.length, loadMessages]);
+    loadUnreadCount();
+  }, [loadUnreadCount]);
 
   if (loading) {
     return (

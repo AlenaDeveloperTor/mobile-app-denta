@@ -28,7 +28,7 @@ export const DEFAULT_MESSAGES: Message[] = [
   },
   {
     id: 'msg-2',
-    category: 'news',
+    category: 'info',
     title: 'Новые часы работы клиники',
     body: 'С сентября клиника работает ежедневно с 8:00 до 21:00. Запись — онлайн или по телефону.',
     is_read: false,
@@ -41,7 +41,7 @@ export const DEFAULT_MESSAGES: Message[] = [
   },
   {
     id: 'msg-3',
-    category: 'appointment',
+    category: 'system',
     title: 'Запись подтверждена',
     body: 'Ваша запись на 10:00 подтверждена. Приходите за 10 минут до начала приёма.',
     is_read: true,
@@ -62,7 +62,7 @@ export const DEFAULT_MESSAGES: Message[] = [
   },
   {
     id: 'msg-5',
-    category: 'general',
+    category: 'system',
     title: 'Добро пожаловать!',
     body: 'Спасибо, что выбрали нашу клинику. Здесь будут появляться уведомления о записях и акциях.',
     is_read: true,

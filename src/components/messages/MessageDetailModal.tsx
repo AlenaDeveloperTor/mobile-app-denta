@@ -10,10 +10,9 @@ import { Image, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { styles } from './MessageDetailModal.styles';
 
 const CATEGORY_LABELS: Record<MessageCategory, string> = {
-  general: 'Уведомление',
   promo: 'Акция',
-  news: 'Новость',
-  appointment: 'Запись',
+  system: 'Уведомление',
+  info: 'Информация',
 };
 
 interface MessageDetailModalProps {

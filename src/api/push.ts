@@ -2,10 +2,10 @@ import { api } from './client';
 
 export const pushAPI = {
   /** Регистрирует push-токен на сервере */
-  registerToken: (token: string, platform: 'ios' | 'android') =>
-    api.post<{ success: boolean }>('/push/register', { token, platform }),
+  registerToken: (deviceId: string, token: string, platform: 'ios' | 'android') =>
+    api.post<{ success: boolean }>('/push/register', { device_id: deviceId, token, platform }),
 
-  /** Отвязывает push-токен */
-  unregisterToken: (token: string) =>
-    api.post<{ success: boolean }>('/push/unregister', { token }),
+  /** Отвязывает push-токен по device_id */
+  unregisterToken: (deviceId: string) =>
+    api.post<{ success: boolean }>('/push/unregister', { device_id: deviceId }),
 };

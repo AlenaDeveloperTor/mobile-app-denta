@@ -1,5 +1,5 @@
 /** Категория сообщения — влияет на иконку и содержимое детального просмотра */
-export type MessageCategory = 'general' | 'promo' | 'news' | 'appointment';
+export type MessageCategory = 'promo' | 'system' | 'info';
 
 /** Баннер внутри сообщения (акция, новость и т.п.) */
 export interface MessageBanner {
@@ -22,5 +22,7 @@ export interface Message {
   is_read: boolean;
   /** ISO-дата создания */
   created_at: string;
+  /** Ссылка внутри приложения, напр. app://appointments */
+  deep_link?: string;
   banner?: MessageBanner;
 }

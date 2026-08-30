@@ -1,5 +1,6 @@
 import { pushAPI } from '@/api/push';
 import { STORAGE_KEYS } from '@/utils/constants';
+import { getDeviceId } from '@/utils/device';
 import { storage } from '@/utils/storage';
 import * as Device from 'expo-device';
 import * as Notifications from 'expo-notifications';
@@ -107,8 +108,10 @@ async function registerForPushNotifications(): Promise<string | null> {
   }
 
   await storage.setItem(STORAGE_KEYS.EXPO_PUSH_TOKEN, expoPushToken);
+
+  const deviceId = await getDeviceId();
   await pushAPI
-    .registerToken(expoPushToken, Platform.OS === 'ios' ? 'ios' : 'android')
+    .registerToken(deviceId, expoPushToken, Platform.OS === 'ios' ? 'ios' : 'android')
     .catch(() => {});
   return expoPushToken;
 }
