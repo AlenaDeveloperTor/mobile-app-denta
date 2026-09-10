@@ -1,33 +1,37 @@
 import { StyleSheet } from 'react-native';
+import { COLORS, FONT, RADIUS } from '@/constants/theme';
 
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    padding: 24,
-    backgroundColor: '#F5F7FA',
+    padding: 28,
+    backgroundColor: COLORS.background,
   },
   iconCircle: {
-    width: 96,
-    height: 96,
-    borderRadius: 48,
-    backgroundColor: '#34C759',
+    width: 100,
+    height: 100,
+    borderRadius: 50,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 20,
+    marginBottom: 22,
+    overflow: 'hidden',
   },
   title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#1A1A2E',
-    marginBottom: 8,
+    fontSize: 26,
+    fontFamily: FONT.medium,
+    color: COLORS.dark,
+    marginBottom: 10,
+    letterSpacing: 0.2,
+    textAlign: 'center',
   },
   subtitle: {
     fontSize: 15,
-    color: '#666',
+    fontFamily: FONT.regular,
+    color: COLORS.textSecondary,
     textAlign: 'center',
-    marginBottom: 24,
+    marginBottom: 28,
     lineHeight: 22,
   },
 });

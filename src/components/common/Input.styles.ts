@@ -1,32 +1,38 @@
 import { StyleSheet } from 'react-native';
+import { COLORS, FONT, RADIUS } from '@/constants/theme';
 
 export const styles = StyleSheet.create({
   container: {
     marginBottom: 15,
   },
   label: {
-    fontSize: 14,
-    fontWeight: '500',
-    marginBottom: 5,
-    color: '#333',
+    fontSize: 13,
+    fontFamily: FONT.medium,
+    marginBottom: 6,
+    color: COLORS.dark,
+    letterSpacing: 0.2,
   },
   input: {
-    borderWidth: 1,
-    borderColor: '#DDD',
-    borderRadius: 8,
-    padding: 12,
+    borderWidth: 1.5,
+    borderColor: COLORS.blue,
+    borderRadius: RADIUS.input,
+    padding: 13,
     fontSize: 16,
+    fontFamily: FONT.regular,
+    color: COLORS.dark,
+    backgroundColor: COLORS.background,
   },
   multiline: {
     minHeight: 80,
     textAlignVertical: 'top',
   },
   inputError: {
-    borderColor: '#FF3B30',
+    borderColor: COLORS.error,
   },
   errorText: {
-    color: '#FF3B30',
+    color: COLORS.error,
     fontSize: 12,
+    fontFamily: FONT.regular,
     marginTop: 4,
   },
 });

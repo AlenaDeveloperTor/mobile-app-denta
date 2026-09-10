@@ -1,16 +1,13 @@
 import { StyleSheet } from 'react-native';
+import { COLORS, FONT, RADIUS, SHADOW } from '@/constants/theme';
 
 export const styles = StyleSheet.create({
   card: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 14,
+    backgroundColor: COLORS.white,
+    borderRadius: RADIUS.card,
     padding: 16,
     marginBottom: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
-    elevation: 3,
+    ...SHADOW.soft,
   },
   header: {
     flexDirection: 'row',
@@ -24,59 +21,61 @@ export const styles = StyleSheet.create({
   },
   dateDay: {
     fontSize: 15,
-    fontWeight: '600',
-    color: '#1A1A2E',
+    fontFamily: FONT.medium,
+    color: COLORS.dark,
   },
   timeText: {
     fontSize: 14,
-    color: '#666',
+    fontFamily: FONT.regular,
+    color: COLORS.textSecondary,
     marginLeft: 10,
   },
   statusBadge: {
-    paddingHorizontal: 10,
+    paddingHorizontal: 12,
     paddingVertical: 4,
-    borderRadius: 12,
+    borderRadius: RADIUS.pill,
   },
   statusPending: {
-    backgroundColor: '#FFF4E5',
+    backgroundColor: COLORS.blueTint,
   },
   statusConfirmed: {
-    backgroundColor: '#E8F4FF',
+    backgroundColor: 'rgba(170,198,238,0.3)',
   },
   statusCancelled: {
-    backgroundColor: '#FFEBEE',
+    backgroundColor: COLORS.errorBg,
   },
   statusCompleted: {
-    backgroundColor: '#E8F5E9',
+    backgroundColor: 'rgba(208,200,181,0.3)',
   },
   statusText: {
     fontSize: 12,
-    fontWeight: '600',
-    color: '#1A1A2E',
+    fontFamily: FONT.medium,
+    color: COLORS.dark,
   },
   body: {
     marginBottom: 12,
   },
   serviceName: {
     fontSize: 16,
-    fontWeight: '600',
-    color: '#1A1A2E',
+    fontFamily: FONT.medium,
+    color: COLORS.dark,
     marginBottom: 4,
   },
   comment: {
     fontSize: 13,
-    color: '#666',
+    fontFamily: FONT.regular,
+    color: COLORS.textSecondary,
   },
   cancelButton: {
     alignSelf: 'flex-start',
     paddingVertical: 6,
-    paddingHorizontal: 14,
-    borderRadius: 16,
-    backgroundColor: '#FFEBEE',
+    paddingHorizontal: 16,
+    borderRadius: RADIUS.pill,
+    backgroundColor: COLORS.errorBg,
   },
   cancelButtonText: {
-    color: '#D32F2F',
+    color: COLORS.error,
+    fontFamily: FONT.medium,
     fontSize: 13,
-    fontWeight: '600',
   },
 });

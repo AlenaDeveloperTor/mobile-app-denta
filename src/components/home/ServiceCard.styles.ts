@@ -1,23 +1,20 @@
 import { StyleSheet } from 'react-native';
+import { COLORS, FONT, RADIUS, SHADOW } from '@/constants/theme';
 
 export const styles = StyleSheet.create({
   serviceCard: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 14,
+    backgroundColor: COLORS.white,
+    borderRadius: RADIUS.card,
     marginBottom: 16,
     overflow: 'hidden',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
-    elevation: 3,
+    ...SHADOW.soft,
   },
   serviceImage: {
     width: '100%',
-    height: 130,
+    height: 140,
   },
   serviceContent: {
-    padding: 14,
+    padding: 16,
   },
   serviceHeader: {
     flexDirection: 'row',
@@ -27,26 +24,28 @@ export const styles = StyleSheet.create({
   },
   serviceName: {
     fontSize: 17,
-    fontWeight: '600',
-    color: '#1A1A2E',
+    fontFamily: FONT.medium,
+    color: COLORS.dark,
     flex: 1,
     marginRight: 8,
   },
   servicePrice: {
-    backgroundColor: '#E8F4FF',
+    backgroundColor: COLORS.blueTint,
     paddingHorizontal: 12,
     paddingVertical: 4,
-    borderRadius: 12,
+    borderRadius: RADIUS.pill,
   },
   servicePriceText: {
-    color: '#007AFF',
-    fontWeight: '600',
-    fontSize: 14,
+    color: COLORS.dark,
+    fontFamily: FONT.medium,
+    fontSize: 13,
   },
   serviceDescription: {
     fontSize: 14,
-    color: '#666',
-    marginBottom: 12,
+    fontFamily: FONT.regular,
+    color: COLORS.textSecondary,
+    marginBottom: 14,
+    lineHeight: 20,
   },
   serviceFooter: {
     flexDirection: 'row',
@@ -59,18 +58,24 @@ export const styles = StyleSheet.create({
   },
   serviceDurationText: {
     fontSize: 13,
-    color: '#666',
+    fontFamily: FONT.regular,
+    color: COLORS.textSecondary,
     marginLeft: 4,
   },
   bookingButton: {
-    backgroundColor: '#007AFF',
-    paddingHorizontal: 20,
+    overflow: 'hidden',
+    borderRadius: RADIUS.pill,
+  },
+  bookingButtonGradient: {
+    paddingHorizontal: 18,
     paddingVertical: 8,
-    borderRadius: 20,
+    borderRadius: RADIUS.pill,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   bookingButtonText: {
-    color: '#FFFFFF',
-    fontWeight: '600',
-    fontSize: 14,
+    color: COLORS.dark,
+    fontFamily: FONT.medium,
+    fontSize: 13,
   },
 });

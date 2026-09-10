@@ -40,7 +40,7 @@ export default function NewsScreen() {
       renderItem={({ item }) => (
         <View style={styles.card}>
           <View style={styles.cardHeader}>
-            <Ionicons name="newspaper-outline" size={20} color="#007AFF" />
+            <Ionicons name="newspaper-outline" size={20} color="#AAC6EE" />
             <Text style={styles.date}>{item.date}</Text>
           </View>
           <Text style={styles.title}>{item.title}</Text>

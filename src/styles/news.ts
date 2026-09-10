@@ -1,23 +1,24 @@
 import { StyleSheet } from 'react-native';
+import { COLORS, FONT, RADIUS } from '@/constants/theme';
 
 export const styles = StyleSheet.create({
   list: {
     flex: 1,
-    backgroundColor: '#F5F7FA',
+    backgroundColor: COLORS.background,
   },
   listContent: {
     padding: 16,
     paddingBottom: 30,
   },
   card: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 14,
+    backgroundColor: COLORS.white,
+    borderRadius: RADIUS.card,
     padding: 16,
     marginBottom: 12,
-    shadowColor: '#000',
+    shadowColor: '#172933',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
+    shadowOpacity: 0.07,
+    shadowRadius: 10,
     elevation: 3,
   },
   cardHeader: {
@@ -27,18 +28,21 @@ export const styles = StyleSheet.create({
   },
   date: {
     fontSize: 13,
-    color: '#666',
+    fontFamily: FONT.regular,
+    color: COLORS.textSecondary,
     marginLeft: 8,
   },
   title: {
     fontSize: 16,
-    fontWeight: '600',
-    color: '#1A1A2E',
+    fontFamily: FONT.medium,
+    color: COLORS.dark,
     marginBottom: 6,
+    letterSpacing: 0.1,
   },
   body: {
     fontSize: 14,
-    color: '#444',
+    fontFamily: FONT.regular,
+    color: COLORS.textSecondary,
     lineHeight: 20,
   },
 });

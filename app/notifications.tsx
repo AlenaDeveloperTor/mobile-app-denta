@@ -23,7 +23,7 @@ export default function NotificationsScreen() {
       return;
     }
 
-    if (messages.some(message => message.id === messageId)) {
+    if (messages.some(message => String(message.id) === String(messageId))) {
       openedMessageId.current = messageId;
       openMessage(messageId);
     }
@@ -62,7 +62,7 @@ export default function NotificationsScreen() {
       }
       ListEmptyComponent={
         <View style={styles.emptyBox}>
-          <Ionicons name="notifications-off-outline" size={56} color="#C7C7CC" />
+          <Ionicons name="notifications-off-outline" size={56} color="#AAC6EE" />
           <Text style={styles.emptyTitle}>Уведомлений пока нет</Text>
         </View>
       }

@@ -1,9 +1,11 @@
 import type { Service } from '@/types/service';
 import { formatDuration, formatPrice } from '@/utils/formatters';
 import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import { Image, Text, TouchableOpacity, View } from 'react-native';
 import { styles } from './ServiceCard.styles';
+import { GRADIENT } from '@/constants/theme';
 
 interface ServiceCardProps {
   service: Service;
@@ -18,7 +20,7 @@ export function ServiceCard({ service }: ServiceCardProps) {
   };
 
   return (
-    <TouchableOpacity style={styles.serviceCard} onPress={handleBooking} activeOpacity={0.8}>
+    <TouchableOpacity style={styles.serviceCard} onPress={handleBooking} activeOpacity={0.85}>
       <Image
         source={{ uri: service.image_url }}
         style={styles.serviceImage}
@@ -36,11 +38,18 @@ export function ServiceCard({ service }: ServiceCardProps) {
         </Text>
         <View style={styles.serviceFooter}>
           <View style={styles.serviceDuration}>
-            <Ionicons name="time-outline" size={16} color="#666" />
+            <Ionicons name="time-outline" size={16} color="#6B7A8F" />
             <Text style={styles.serviceDurationText}>{formatDuration(service.duration)}</Text>
           </View>
           <TouchableOpacity style={styles.bookingButton} onPress={handleBooking}>
-            <Text style={styles.bookingButtonText}>Записаться</Text>
+            <LinearGradient
+              colors={GRADIENT.colors}
+              start={GRADIENT.start}
+              end={GRADIENT.end}
+              style={styles.bookingButtonGradient}
+            >
+              <Text style={styles.bookingButtonText}>Записаться</Text>
+            </LinearGradient>
           </TouchableOpacity>
         </View>
       </View>

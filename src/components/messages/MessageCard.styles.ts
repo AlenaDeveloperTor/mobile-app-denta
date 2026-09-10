@@ -1,23 +1,20 @@
 import { StyleSheet } from 'react-native';
+import { COLORS, FONT, RADIUS, SHADOW } from '@/constants/theme';
 
 export const styles = StyleSheet.create({
   card: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-    borderRadius: 14,
+    backgroundColor: COLORS.white,
+    borderRadius: RADIUS.card,
     padding: 14,
     marginBottom: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 6,
-    elevation: 2,
+    ...SHADOW.soft,
   },
   cardUnread: {
-    backgroundColor: '#F0F7FF',
+    backgroundColor: COLORS.blueTint,
     borderWidth: 1,
-    borderColor: '#D6E9FF',
+    borderColor: COLORS.blue,
   },
   iconCircle: {
     width: 44,
@@ -26,6 +23,7 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 12,
+    backgroundColor: 'rgba(170,198,238,0.2)',
   },
   content: {
     flex: 1,
@@ -33,26 +31,28 @@ export const styles = StyleSheet.create({
   },
   title: {
     fontSize: 15,
-    fontWeight: '500',
-    color: '#1A1A2E',
+    fontFamily: FONT.regular,
+    color: COLORS.dark,
     marginBottom: 2,
   },
   titleUnread: {
-    fontWeight: '700',
+    fontFamily: FONT.medium,
   },
   body: {
     fontSize: 13,
-    color: '#666',
+    fontFamily: FONT.regular,
+    color: COLORS.textSecondary,
     marginBottom: 4,
   },
   time: {
     fontSize: 12,
-    color: '#999',
+    fontFamily: FONT.regular,
+    color: '#9AA5B4',
   },
   unreadDot: {
     width: 10,
     height: 10,
     borderRadius: 5,
-    backgroundColor: '#007AFF',
+    backgroundColor: COLORS.blue,
   },
 });

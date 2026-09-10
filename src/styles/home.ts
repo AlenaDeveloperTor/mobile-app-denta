@@ -1,15 +1,16 @@
 import { StyleSheet } from 'react-native';
+import { COLORS, FONT, RADIUS } from '@/constants/theme';
 
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F5F7FA',
+    backgroundColor: COLORS.background,
   },
   loadingContainer: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#F5F7FA',
+    backgroundColor: COLORS.background,
   },
   headerContainer: {
     flexDirection: 'row',
@@ -17,19 +18,20 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 20,
     paddingTop: 20,
-    paddingBottom: 15,
-    backgroundColor: '#F5F7FA',
+    paddingBottom: 16,
+    backgroundColor: COLORS.background,
   },
   greeting: {
-    fontSize: 14,
-    color: '#666',
-    fontWeight: '400',
+    fontSize: 13,
+    fontFamily: FONT.regular,
+    color: COLORS.textSecondary,
   },
   userName: {
     fontSize: 24,
-    fontWeight: 'bold',
-    color: '#1A1A2E',
+    fontFamily: FONT.medium,
+    color: COLORS.dark,
     marginTop: 2,
+    letterSpacing: 0.2,
   },
   profileIcon: {
     padding: 4,
@@ -48,20 +50,20 @@ export const styles = StyleSheet.create({
     right: 0,
     minWidth: 18,
     height: 18,
-    borderRadius: 9,
-    backgroundColor: '#FF3B30',
+    borderRadius: RADIUS.pill,
+    backgroundColor: COLORS.blue,
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 4,
   },
   badgeText: {
-    color: '#FFFFFF',
-    fontSize: 11,
-    fontWeight: '700',
+    color: COLORS.dark,
+    fontSize: 10,
+    fontFamily: FONT.medium,
   },
   bookSection: {
     paddingHorizontal: 20,
-    marginTop: -12,
+    marginTop: -8,
     marginBottom: 10,
   },
   bottomPadding: {

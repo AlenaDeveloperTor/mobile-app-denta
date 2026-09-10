@@ -1,4 +1,5 @@
 import { Dimensions, StyleSheet } from 'react-native';
+import { COLORS, FONT, RADIUS } from '@/constants/theme';
 
 const { width } = Dimensions.get('window');
 
@@ -7,13 +8,13 @@ export const styles = StyleSheet.create({
     marginVertical: 10,
   },
   carousel: {
-    height: 200,
+    height: 210,
   },
   bannerSlide: {
     width: width - 40,
-    height: 200,
+    height: 210,
     marginHorizontal: 20,
-    borderRadius: 16,
+    borderRadius: RADIUS.card,
     overflow: 'hidden',
     position: 'relative',
   },
@@ -27,37 +28,38 @@ export const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.4)',
+    backgroundColor: 'rgba(23, 41, 51, 0.52)',
     justifyContent: 'center',
-    padding: 20,
+    padding: 22,
   },
   bannerTextContainer: {
     flex: 1,
     justifyContent: 'center',
   },
   bannerTitle: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#FFFFFF',
+    fontSize: 26,
+    fontFamily: FONT.medium,
+    color: COLORS.white,
     marginBottom: 6,
+    letterSpacing: 0.2,
   },
   bannerSubtitle: {
-    fontSize: 16,
-    color: '#FFFFFF',
-    opacity: 0.9,
-    marginBottom: 12,
+    fontSize: 15,
+    fontFamily: FONT.regular,
+    color: 'rgba(255,255,255,0.85)',
+    marginBottom: 14,
   },
   bannerButton: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: COLORS.white,
     paddingHorizontal: 20,
     paddingVertical: 10,
-    borderRadius: 25,
+    borderRadius: RADIUS.pill,
     alignSelf: 'flex-start',
   },
   bannerButtonText: {
-    color: '#007AFF',
-    fontWeight: '600',
-    fontSize: 14,
+    color: COLORS.dark,
+    fontFamily: FONT.medium,
+    fontSize: 13,
   },
   dotsContainer: {
     flexDirection: 'row',

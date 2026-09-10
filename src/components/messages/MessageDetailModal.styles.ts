@@ -1,20 +1,22 @@
 import { StyleSheet } from 'react-native';
+import { COLORS, FONT, RADIUS, SHADOW } from '@/constants/theme';
 
 export const styles = StyleSheet.create({
   modalContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: 'rgba(23, 41, 51, 0.6)',
     padding: 20,
   },
   modalContent: {
     width: '100%',
     maxWidth: 420,
     maxHeight: '90%',
-    backgroundColor: '#FFFFFF',
-    borderRadius: 20,
+    backgroundColor: COLORS.white,
+    borderRadius: RADIUS.card,
     padding: 24,
+    ...SHADOW.medium,
   },
   header: {
     flexDirection: 'row',
@@ -23,32 +25,33 @@ export const styles = StyleSheet.create({
     marginBottom: 12,
   },
   categoryBadge: {
-    backgroundColor: '#F0F7FF',
-    borderRadius: 12,
-    paddingHorizontal: 12,
+    backgroundColor: COLORS.blueTint,
+    borderRadius: RADIUS.pill,
+    paddingHorizontal: 14,
     paddingVertical: 4,
   },
   categoryText: {
     fontSize: 12,
-    fontWeight: '600',
-    color: '#007AFF',
+    fontFamily: FONT.medium,
+    color: COLORS.dark,
   },
   closeButton: {
     padding: 4,
   },
   title: {
     fontSize: 22,
-    fontWeight: 'bold',
-    color: '#1A1A2E',
+    fontFamily: FONT.medium,
+    color: COLORS.dark,
     marginBottom: 6,
   },
   date: {
     fontSize: 13,
-    color: '#999',
+    fontFamily: FONT.regular,
+    color: '#9AA5B4',
     marginBottom: 16,
   },
   bannerWrap: {
-    borderRadius: 14,
+    borderRadius: RADIUS.block,
     overflow: 'hidden',
     marginBottom: 16,
     height: 160,
@@ -59,13 +62,15 @@ export const styles = StyleSheet.create({
   },
   body: {
     fontSize: 15,
+    fontFamily: FONT.regular,
     lineHeight: 22,
-    color: '#333',
+    color: COLORS.textSecondary,
     marginBottom: 20,
   },
   notFound: {
     fontSize: 16,
-    color: '#666',
+    fontFamily: FONT.regular,
+    color: COLORS.textSecondary,
     textAlign: 'center',
     marginBottom: 20,
   },

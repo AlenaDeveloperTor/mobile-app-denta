@@ -58,7 +58,7 @@ export default function HomeScreen() {
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#007AFF" />
+        <ActivityIndicator size="large" color="#AAC6EE" />
       </View>
     );
   }
@@ -86,7 +86,7 @@ export default function HomeScreen() {
             onPress={() => router.push('/notifications')}
             hitSlop={8}
           >
-            <Ionicons name="notifications-outline" size={28} color="#007AFF" />
+            <Ionicons name="notifications-outline" size={28} color="#172933" />
             {unreadCount > 0 && (
               <View style={styles.badge}>
                 <Text style={styles.badgeText}>{unreadCount > 9 ? '9+' : unreadCount}</Text>
@@ -97,7 +97,7 @@ export default function HomeScreen() {
             style={styles.profileIcon}
             onPress={() => router.push('/profile')}
           >
-            <Ionicons name="person-circle-outline" size={44} color="#007AFF" />
+            <Ionicons name="person-circle-outline" size={44} color="#172933" />
           </TouchableOpacity>
         </View>
       </View>

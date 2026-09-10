@@ -3,9 +3,22 @@ export interface User {
   phone: string;
   first_name: string;
   last_name: string;
+  patronymic?: string;
+  birth_date?: string;
   email?: string;
   loyalty_balance: number;
+  is_active?: boolean;
+  avatar_url?: string;
   created_at?: string;
+}
+
+/** Поля для обновления профиля через PATCH /users/me */
+export interface UpdateProfileInput {
+  first_name?: string;
+  last_name?: string;
+  patronymic?: string;
+  email?: string;
+  birth_date?: string;
 }
 
 /** Пара токенов (access + refresh) */

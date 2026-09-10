@@ -1,4 +1,4 @@
-import type { AuthResponse, CodeRequestResponse, TokenPair, User } from '@/types/user';
+import type { AuthResponse, CodeRequestResponse, TokenPair, UpdateProfileInput, User } from '@/types/user';
 import { api } from './client';
 
 export const authAPI = {
@@ -7,8 +7,8 @@ export const authAPI = {
     api.post<CodeRequestResponse>('/auth/request-code', { phone }),
 
   /** Подтвердить код по session_id и получить пару токенов */
-  verifyCode: (sessionId: string, code: string) =>
-    api.post<AuthResponse>('/auth/verify-code', { session_id: sessionId, code }),
+  verifyCode: (sessionId: string, code: string, deviceId: string) =>
+    api.post<AuthResponse>('/auth/verify-code', { session_id: sessionId, code, device_id: deviceId }),
 
   /** Обновить пару токенов по refresh-токену */
   refresh: (refreshToken: string) =>
@@ -16,4 +16,7 @@ export const authAPI = {
 
   /** Получить профиль текущего пользователя */
   getProfile: () => api.get<User>('/users/me'),
+
+  /** Обновить профиль текущего пользователя */
+  updateProfile: (data: UpdateProfileInput) => api.patch<User>('/users/me', data),
 };

@@ -1,28 +1,44 @@
 import { StyleSheet } from 'react-native';
+import { COLORS, FONT, RADIUS } from '@/constants/theme';
 
 export const styles = StyleSheet.create({
+  /** Обёртка — нужна для задания borderRadius на TouchableOpacity */
   button: {
-    padding: 15,
-    borderRadius: 10,
+    borderRadius: RADIUS.pill,
+    overflow: 'hidden',
+  },
+  /** Внутренний слой для Primary (LinearGradient) */
+  primaryInner: {
+    paddingVertical: 15,
+    paddingHorizontal: 20,
     alignItems: 'center',
     justifyContent: 'center',
     flexDirection: 'row',
+    borderRadius: RADIUS.pill,
   },
-  primary: {
-    backgroundColor: '#007AFF',
-  },
+  /** Внутренний слой для Secondary */
   secondary: {
-    backgroundColor: '#E5E5EA',
+    paddingVertical: 14,
+    paddingHorizontal: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexDirection: 'row',
+    borderRadius: RADIUS.pill,
+    backgroundColor: COLORS.white,
+    borderWidth: 1.5,
+    borderColor: COLORS.blue,
   },
   disabled: {
-    opacity: 0.6,
+    opacity: 0.55,
   },
   text: {
-    color: '#FFFFFF',
+    color: COLORS.dark,
     fontSize: 16,
-    fontWeight: '600',
+    fontFamily: FONT.medium,
+    letterSpacing: 0.3,
   },
   secondaryText: {
-    color: '#007AFF',
+    color: COLORS.dark,
+    fontFamily: FONT.medium,
   },
 });

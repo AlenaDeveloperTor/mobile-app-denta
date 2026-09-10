@@ -1,9 +1,10 @@
 import { StyleSheet } from 'react-native';
+import { COLORS, FONT, RADIUS } from '@/constants/theme';
 
 export const styles = StyleSheet.create({
   list: {
     flex: 1,
-    backgroundColor: '#F5F7FA',
+    backgroundColor: COLORS.background,
   },
   listContent: {
     padding: 16,
@@ -13,17 +14,17 @@ export const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 12,
+    marginBottom: 14,
   },
   headerTitle: {
     fontSize: 20,
-    fontWeight: 'bold',
-    color: '#1A1A2E',
+    fontFamily: FONT.medium,
+    color: COLORS.dark,
   },
   markAll: {
     fontSize: 14,
-    color: '#007AFF',
-    fontWeight: '500',
+    fontFamily: FONT.medium,
+    color: COLORS.blue,
   },
   emptyBox: {
     alignItems: 'center',
@@ -32,7 +33,8 @@ export const styles = StyleSheet.create({
   },
   emptyTitle: {
     fontSize: 16,
-    color: '#666',
-    marginTop: 12,
+    fontFamily: FONT.regular,
+    color: COLORS.textSecondary,
+    marginTop: 14,
   },
 });

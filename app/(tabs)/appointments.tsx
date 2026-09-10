@@ -18,7 +18,7 @@ export default function AppointmentsScreen() {
   if (appointments.length === 0) {
     return (
       <View style={styles.emptyContainer}>
-        <Ionicons name="calendar-outline" size={64} color="#C7C7CC" />
+        <Ionicons name="calendar-outline" size={64} color="#AAC6EE" />
         <Text style={styles.emptyTitle}>Записей пока нет</Text>
         <Text style={styles.emptyText}>
           Запишитесь к врачу, чтобы видеть свои визиты здесь

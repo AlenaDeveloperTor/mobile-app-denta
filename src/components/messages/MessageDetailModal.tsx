@@ -31,7 +31,9 @@ export function MessageDetailModal({ messageId }: MessageDetailModalProps) {
   const [message, setMessage] = useState<Message | undefined>();
 
   useEffect(() => {
-    const found = messages.find((m) => m.id === messageId);
+    // Бэкенд возвращает id как integer, URL-параметр — строка.
+    // Сравниваем через String() чтобы избежать несовпадения типов.
+    const found = messages.find((m) => String(m.id) === String(messageId));
     setMessage(found);
     if (found && !found.is_read) {
       markAsRead(found.id);

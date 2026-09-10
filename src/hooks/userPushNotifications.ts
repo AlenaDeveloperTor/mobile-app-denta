@@ -8,14 +8,16 @@ import { router } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
 import { Platform } from 'react-native';
 
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowBanner: true,
-    shouldShowList: true,
-    shouldPlaySound: true,
-    shouldSetBadge: false,
-  }),
-});
+if (Platform.OS !== 'web') {
+  Notifications.setNotificationHandler({
+    handleNotification: async () => ({
+      shouldShowBanner: true,
+      shouldShowList: true,
+      shouldPlaySound: true,
+      shouldSetBadge: false,
+    }),
+  });
+}
 
 /** Регистрирует устройство для push-уведомлений и возвращает токен */
 export function usePushNotifications(enabled = true) {
@@ -24,7 +26,7 @@ export function usePushNotifications(enabled = true) {
   const handledResponseIds = useRef(new Set<string>());
 
   useEffect(() => {
-    if (!enabled) {
+    if (!enabled || Platform.OS === 'web') {
       return;
     }
 
@@ -80,7 +82,7 @@ function handleNotificationResponse(
 }
 
 async function registerForPushNotifications(): Promise<string | null> {
-  if (!Device.isDevice) {
+  if (Platform.OS === 'web' || !Device.isDevice) {
     return null;
   }
 

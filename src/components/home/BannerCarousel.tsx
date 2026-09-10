@@ -23,7 +23,14 @@ export function BannerCarousel({ banners }: BannerCarouselProps) {
     const interval = setInterval(() => {
       const nextIndex = (activeIndex + 1) % banners.length;
       setActiveIndex(nextIndex);
-      flatListRef.current?.scrollToIndex({ index: nextIndex, animated: true });
+      // Безопасный скролл с проверкой валидности индекса
+      if (flatListRef.current && nextIndex < banners.length) {
+        flatListRef.current.scrollToIndex({
+          index: nextIndex,
+          animated: true,
+          viewPosition: 0,
+        });
+      }
     }, 5000);
     return () => clearInterval(interval);
   }, [activeIndex, banners.length]);
@@ -34,6 +41,26 @@ export function BannerCarousel({ banners }: BannerCarouselProps) {
 
   const handleBannerPress = () => {
     openBooking();
+  };
+
+  // getItemLayout: вычисляет размер и позицию каждого элемента
+  // Обязателен для scrollToIndex
+  const getItemLayout = (data: Banner[] | null, index: number) => ({
+    length: width,
+    offset: width * index,
+    index,
+  });
+
+  // Обработчик ошибок при скролле (например, если индекс вне границ)
+  const handleScrollToIndexFailed = (info: {
+    index: number;
+    highestMeasuredFrameIndex: number;
+    averageItemLength: number;
+  }) => {
+    console.warn('scrollToIndex failed:', info);
+    // Fallback: используем scrollToOffset вместо scrollToIndex
+    const offset = info.index * width;
+    flatListRef.current?.scrollToOffset({ offset, animated: true });
   };
 
   const renderBanner = ({ item }: { item: Banner }) => (
@@ -60,7 +87,7 @@ export function BannerCarousel({ banners }: BannerCarouselProps) {
       key={index}
       style={[
         styles.dot,
-        { backgroundColor: index === activeIndex ? '#007AFF' : '#CCCCCC' },
+        { backgroundColor: index === activeIndex ? '#AAC6EE' : 'rgba(170,198,238,0.3)' },
       ]}
     />
   );
@@ -75,6 +102,8 @@ export function BannerCarousel({ banners }: BannerCarouselProps) {
         horizontal
         pagingEnabled
         showsHorizontalScrollIndicator={false}
+        getItemLayout={getItemLayout}
+        onScrollToIndexFailed={handleScrollToIndexFailed}
         onMomentumScrollEnd={(event) => {
           const index = Math.round(event.nativeEvent.contentOffset.x / width);
           setActiveIndex(index);

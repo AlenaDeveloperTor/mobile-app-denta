@@ -1,4 +1,5 @@
 import { StyleSheet } from 'react-native';
+import { COLORS, FONT, RADIUS, SHADOW } from '@/constants/theme';
 
 export const styles = StyleSheet.create({
   promoSection: {
@@ -7,43 +8,45 @@ export const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 18,
-    fontWeight: 'bold',
-    color: '#1A1A2E',
-    marginBottom: 15,
+    fontFamily: FONT.medium,
+    color: COLORS.dark,
+    marginBottom: 14,
+    letterSpacing: 0.2,
   },
   promoCard: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 14,
-    padding: 16,
+    backgroundColor: COLORS.dark,
+    borderRadius: RADIUS.card,
+    padding: 18,
     marginBottom: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
-    elevation: 3,
-    borderLeftWidth: 4,
-    borderLeftColor: '#FF6B35',
+    ...SHADOW.medium,
   },
   promoContent: {
     flex: 1,
   },
   promoTitle: {
     fontSize: 16,
-    fontWeight: '600',
-    color: '#1A1A2E',
-    marginBottom: 4,
+    fontFamily: FONT.medium,
+    color: COLORS.white,
+    marginBottom: 6,
   },
   promoDescription: {
     fontSize: 14,
-    color: '#666',
-    marginBottom: 10,
+    fontFamily: FONT.regular,
+    color: 'rgba(255,255,255,0.72)',
+    marginBottom: 14,
+    lineHeight: 20,
   },
   promoButton: {
     alignSelf: 'flex-start',
+    borderWidth: 1.5,
+    borderColor: COLORS.blue,
+    borderRadius: RADIUS.pill,
+    paddingHorizontal: 16,
+    paddingVertical: 6,
   },
   promoButtonText: {
-    color: '#007AFF',
-    fontWeight: '600',
-    fontSize: 14,
+    color: COLORS.blue,
+    fontFamily: FONT.medium,
+    fontSize: 13,
   },
 });

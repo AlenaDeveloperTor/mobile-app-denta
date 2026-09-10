@@ -86,18 +86,47 @@ api.interceptors.response.use(
   }
 );
 
-/** Возвращает человекочитаемое сообщение об ошибке */
+/** Возвращает человекочитаемое сообщение об ошибке (гарантированно строку) */
 export function getErrorMessage(
   error: unknown,
   fallback = 'Произошла ошибка. Попробуйте ещё раз.'
 ): string {
   if (axios.isAxiosError(error)) {
-    const data = error.response?.data as
-      | { message?: string; error?: string; code?: string }
-      | undefined;
-    return data?.message || data?.error || data?.code || error.message || fallback;
+    const data = error.response?.data;
+    if (typeof data === 'string' && data.trim()) {
+      return data;
+    }
+    if (data && typeof data === 'object') {
+      const d = data as Record<string, unknown>;
+      // Массив сообщений (например, валидационные ошибки NestJS / class-validator)
+      if (Array.isArray(d.message)) {
+        return d.message.filter(Boolean).map(String).join('\n') || fallback;
+      }
+      if (typeof d.message === 'string' && d.message.trim()) {
+        return d.message;
+      }
+      if (typeof d.error === 'string' && d.error.trim()) {
+        return d.error;
+      }
+      if (typeof d.detail === 'string' && d.detail.trim()) {
+        return d.detail;
+      }
+      if (d.error && typeof d.error === 'object') {
+        const nestedErr = d.error as Record<string, unknown>;
+        if (typeof nestedErr.message === 'string' && nestedErr.message.trim()) {
+          return nestedErr.message;
+        }
+      }
+      if (typeof d.code === 'string' && d.code.trim()) {
+        return d.code;
+      }
+    }
+    if (typeof error.message === 'string' && error.message.trim()) {
+      return error.message;
+    }
+    return fallback;
   }
-  if (error instanceof Error && error.message) {
+  if (error instanceof Error && typeof error.message === 'string' && error.message.trim()) {
     return error.message;
   }
   return fallback;

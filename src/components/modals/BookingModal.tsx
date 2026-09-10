@@ -127,8 +127,8 @@ export function BookingModal() {
   return (
     <View style={styles.overlay}>
       <BlurView
-        blurTarget={bookingBlurTargetRef}
-        blurMethod="dimezisBlurViewSdk31Plus"
+        blurTarget={Platform.OS === 'android' ? bookingBlurTargetRef : undefined}
+        blurMethod={Platform.OS === 'android' ? 'dimezisBlurViewSdk31Plus' : undefined}
         intensity={30}
         tint="dark"
         style={styles.backdrop}
@@ -157,7 +157,7 @@ export function BookingModal() {
               <Text style={styles.label}>Вид услуги *</Text>
               {servicesLoading ? (
                 <View style={styles.loadingContainer}>
-                  <ActivityIndicator color="#007AFF" />
+                  <ActivityIndicator color="#AAC6EE" />
                 </View>
               ) : (
                 <View style={styles.serviceList}>
@@ -185,7 +185,7 @@ export function BookingModal() {
                             selected ? 'radio-button-on' : 'radio-button-off'
                           }
                           size={22}
-                          color={selected ? '#007AFF' : '#C7C7CC'}
+                          color={selected ? '#AAC6EE' : '#C7C7CC'}
                         />
                       </TouchableOpacity>
                     );

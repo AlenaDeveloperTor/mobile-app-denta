@@ -1,4 +1,5 @@
 import { StyleSheet } from 'react-native';
+import { COLORS, FONT, RADIUS, SHADOW } from '@/constants/theme';
 
 export const styles = StyleSheet.create({
   overlay: {
@@ -34,25 +35,21 @@ export const styles = StyleSheet.create({
     width: '100%',
     maxWidth: 420,
     maxHeight: '90%',
-    backgroundColor: '#FFFFFF',
-    borderRadius: 20,
+    backgroundColor: COLORS.white,
+    borderRadius: RADIUS.card,
     padding: 24,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.25,
-    shadowRadius: 20,
-    elevation: 8,
+    ...SHADOW.medium,
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 16,
+    marginBottom: 18,
   },
   title: {
     fontSize: 22,
-    fontWeight: 'bold',
-    color: '#1A1A2E',
+    fontFamily: FONT.medium,
+    color: COLORS.dark,
     flex: 1,
     marginRight: 8,
   },
@@ -60,10 +57,10 @@ export const styles = StyleSheet.create({
     padding: 4,
   },
   label: {
-    fontSize: 14,
-    fontWeight: '500',
+    fontSize: 13,
+    fontFamily: FONT.medium,
     marginBottom: 8,
-    color: '#333',
+    color: COLORS.dark,
   },
   serviceList: {
     marginBottom: 16,
@@ -71,16 +68,16 @@ export const styles = StyleSheet.create({
   serviceItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#DDD',
-    borderRadius: 12,
+    borderWidth: 1.5,
+    borderColor: 'rgba(170,198,238,0.4)',
+    borderRadius: RADIUS.block,
     padding: 12,
     marginBottom: 8,
-    backgroundColor: '#FAFAFA',
+    backgroundColor: '#FAFCFF',
   },
   serviceItemSelected: {
-    borderColor: '#007AFF',
-    backgroundColor: '#F0F7FF',
+    borderColor: COLORS.blue,
+    backgroundColor: COLORS.blueTint,
   },
   serviceInfo: {
     flex: 1,
@@ -88,13 +85,14 @@ export const styles = StyleSheet.create({
   },
   serviceName: {
     fontSize: 15,
-    fontWeight: '600',
-    color: '#1A1A2E',
+    fontFamily: FONT.medium,
+    color: COLORS.dark,
     marginBottom: 2,
   },
   serviceMeta: {
     fontSize: 13,
-    color: '#666',
+    fontFamily: FONT.regular,
+    color: COLORS.textSecondary,
   },
   loadingContainer: {
     paddingVertical: 24,
@@ -103,13 +101,15 @@ export const styles = StyleSheet.create({
   },
   emptyText: {
     fontSize: 14,
-    color: '#666',
+    fontFamily: FONT.regular,
+    color: COLORS.textSecondary,
     textAlign: 'center',
     paddingVertical: 16,
     marginBottom: 16,
   },
   errorText: {
-    color: '#FF3B30',
+    color: COLORS.error,
+    fontFamily: FONT.regular,
     fontSize: 12,
     marginBottom: 8,
   },
