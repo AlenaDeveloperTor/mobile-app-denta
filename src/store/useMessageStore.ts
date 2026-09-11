@@ -22,6 +22,16 @@ interface MessageState {
   clear: () => void;
 }
 
+function normalizeMessage(message: Message): Message {
+  const isAppointment =
+    message.deep_link === 'app://appointments' ||
+    /записан|запись в клинику|запись подтверждена/i.test(`${message.title} ${message.body}`);
+
+  return isAppointment && message.category === 'promo'
+    ? { ...message, category: 'system' }
+    : message;
+}
+
 export const useMessageStore = create<MessageState>((set, get) => ({
   messages: [],
   loading: false,
@@ -32,7 +42,7 @@ export const useMessageStore = create<MessageState>((set, get) => ({
     try {
       const res = await messagesAPI.getList();
       const data = res.data;
-      const items = data.items && data.items.length > 0 ? data.items : DEFAULT_MESSAGES;
+      const items = (data.items && data.items.length > 0 ? data.items : DEFAULT_MESSAGES).map(normalizeMessage);
       const unreadCount =
         data.unread_count ?? items.filter((m) => !m.is_read).length;
       set({ messages: items, unreadCount, loading: false });
@@ -40,9 +50,10 @@ export const useMessageStore = create<MessageState>((set, get) => ({
       // API недоступен — показываем демо-сообщения, чтобы раздел можно было протестировать
       console.warn('Не удалось загрузить сообщения, показываем демо:', error);
       const fallback = DEFAULT_MESSAGES;
+      const normalizedFallback = fallback.map(normalizeMessage);
       set({
-        messages: fallback,
-        unreadCount: fallback.filter((m) => !m.is_read).length,
+        messages: normalizedFallback,
+        unreadCount: normalizedFallback.filter((m) => !m.is_read).length,
         loading: false,
       });
     }
@@ -81,7 +92,7 @@ export const useMessageStore = create<MessageState>((set, get) => ({
 
   addMessage: (message) =>
     set((state) => ({
-      messages: [message, ...state.messages],
+      messages: [normalizeMessage(message), ...state.messages],
       unreadCount: message.is_read ? state.unreadCount : state.unreadCount + 1,
     })),
 

@@ -5,12 +5,13 @@ import { Platform } from 'react-native';
 
 // Экран-обёртка: читает параметры и рендерит нужную модалку
 export default function ModalScreen() {
-  const { type, serviceId, message, promoId, messageId } = useLocalSearchParams<{
+  const { type, serviceId, message, promoId, messageId, appointmentId } = useLocalSearchParams<{
     type?: string;
     serviceId?: string;
     message?: string;
     promoId?: string;
     messageId?: string;
+    appointmentId?: string;
   }>();
 
   return (
@@ -22,6 +23,7 @@ export default function ModalScreen() {
         message={message}
         promoId={promoId}
         messageId={messageId}
+        appointmentId={appointmentId}
       />
     </>
   );

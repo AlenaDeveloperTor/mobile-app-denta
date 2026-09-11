@@ -29,7 +29,7 @@ export function AppointmentCard({ appointment, onPress, onCancel }: AppointmentC
   const canCancel =
     onCancel && appointment.status !== 'cancelled' && appointment.status !== 'completed';
 
-  // Приоритет: appointment_datetime (единое поле из бэкенда), фоллбэк на устаревшие date/time
+  // Приоритет: единое поле из бэкенда, затем старые поля для совместимости.
   let dateText: string;
   let timeText: string;
 
@@ -37,7 +37,7 @@ export function AppointmentCard({ appointment, onPress, onCancel }: AppointmentC
     dateText = formatDateTime(appointment.appointment_datetime);
     timeText = '';
   } else {
-    dateText = appointment.date ? formatDate(appointment.date) : 'По договорённости';
+    dateText = appointment.date ? formatDate(appointment.date) : 'Дата уточняется';
     timeText = appointment.time ?? '—';
   }
 

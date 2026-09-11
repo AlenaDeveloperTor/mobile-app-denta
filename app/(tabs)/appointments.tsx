@@ -5,6 +5,7 @@ import { useAppointments } from '@/hooks/useAppointments';
 import { useBookingModalStore } from '@/store/useBookingModalStore';
 import { styles } from '@/styles/appointments';
 import { Ionicons } from '@expo/vector-icons';
+import { router } from 'expo-router';
 import { FlatList, Text, View } from 'react-native';
 
 export default function AppointmentsScreen() {
@@ -35,7 +36,11 @@ export default function AppointmentsScreen() {
       data={appointments}
       keyExtractor={(item) => String(item.id)}
       renderItem={({ item }) => (
-        <AppointmentCard appointment={item} onCancel={() => cancel(String(item.id))} />
+        <AppointmentCard
+          appointment={item}
+          onPress={() => router.push({ pathname: '/modal', params: { type: 'appointment', appointmentId: String(item.id) } })}
+          onCancel={() => cancel(String(item.id))}
+        />
       )}
       refreshing={refreshing}
       onRefresh={refresh}

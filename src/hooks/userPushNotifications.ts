@@ -75,8 +75,12 @@ function handleNotificationResponse(
     return;
   }
 
-  const url = data?.url;
+  const url = data?.deep_link ?? data?.url;
   if (typeof url === 'string') {
+    if (url === 'app://appointments') {
+      router.push('/(tabs)/appointments');
+      return;
+    }
     router.push(url as never);
   }
 }

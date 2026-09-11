@@ -1,10 +1,11 @@
 import { MessageDetailModal } from '@/components/messages/MessageDetailModal';
+import { AppointmentDetailModal } from './AppointmentDetailModal';
 import { useBookingModalStore } from '@/store/useBookingModalStore';
 import { useEffect } from 'react';
 import { ConfirmModal } from './ConfirmModal';
 import { PromoModal } from './PromoModal';
 
-export type ModalType = 'booking' | 'confirm' | 'promo' | 'message';
+export type ModalType = 'booking' | 'confirm' | 'promo' | 'message' | 'appointment';
 
 export interface ModalRendererProps {
   type?: string;
@@ -12,6 +13,7 @@ export interface ModalRendererProps {
   message?: string;
   promoId?: string;
   messageId?: string;
+  appointmentId?: string;
 }
 
 /**
@@ -37,6 +39,7 @@ export function ModalRenderer({
   message,
   promoId,
   messageId,
+  appointmentId,
 }: ModalRendererProps) {
   switch (type) {
     case 'confirm':
@@ -45,11 +48,13 @@ export function ModalRenderer({
       return <PromoModal promoId={promoId} />;
     case 'message':
       return <MessageDetailModal messageId={messageId} />;
+    case 'appointment':
+      return <AppointmentDetailModal appointmentId={appointmentId} />;
     case 'booking':
     default:
       return <BookingModalBridge serviceId={serviceId} />;
   }
 }
 
-export { ConfirmModal, MessageDetailModal, PromoModal };
+export { AppointmentDetailModal, ConfirmModal, MessageDetailModal, PromoModal };
 
