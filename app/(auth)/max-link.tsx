@@ -43,7 +43,7 @@ export default function MaxLinkScreen() {
         придёт в чат с ботом.
       </Text>
 
-      <Button title="Открыть бота в MAX" onPress={openBot} />
+      <Button title="Открыть бота в MAX" onPress={openBot}  style={styles.button} />
       <Button title="Продолжить" variant="secondary" onPress={continueToVerify} />
     </View>
   );

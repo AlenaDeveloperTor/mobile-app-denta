@@ -31,4 +31,7 @@ export const styles = StyleSheet.create({
     lineHeight: 24,
     marginBottom: 32,
   },
+  button: {
+  marginBottom: 12,
+}
 });
