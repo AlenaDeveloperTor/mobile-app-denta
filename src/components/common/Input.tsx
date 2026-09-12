@@ -11,6 +11,7 @@ interface InputProps {
   multiline?: boolean;
   maxLength?: number;
   error?: string;
+  onFocus?: () => void;
 }
 
 export const Input = ({
@@ -23,6 +24,7 @@ export const Input = ({
   multiline = false,
   maxLength,
   error,
+  onFocus,
 }: InputProps) => {
   return (
     <View style={styles.container}>
@@ -36,6 +38,7 @@ export const Input = ({
         secureTextEntry={secureTextEntry}
         multiline={multiline}
         maxLength={maxLength}
+        onFocus={onFocus}
       />
       {error ? <Text style={styles.errorText}>{error}</Text> : null}
     </View>

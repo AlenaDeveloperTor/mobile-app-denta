@@ -45,7 +45,7 @@ export function BannerCarousel({ banners }: BannerCarouselProps) {
 
   // getItemLayout: вычисляет размер и позицию каждого элемента
   // Обязателен для scrollToIndex
-  const getItemLayout = (data: Banner[] | null, index: number) => ({
+  const getItemLayout = (_data: ArrayLike<Banner> | null | undefined, index: number) => ({
     length: width,
     offset: width * index,
     index,

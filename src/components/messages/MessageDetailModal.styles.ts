@@ -12,7 +12,7 @@ export const styles = StyleSheet.create({
   modalContent: {
     width: '100%',
     maxWidth: 420,
-    maxHeight: '90%',
+    maxHeight: '94%',
     backgroundColor: COLORS.white,
     borderRadius: RADIUS.card,
     padding: 24,

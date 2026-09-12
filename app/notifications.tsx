@@ -3,12 +3,12 @@ import { MessageCard } from '@/components/messages/MessageCard';
 import { useMessageStore } from '@/store/useMessageStore';
 import { styles } from '@/styles/notifications';
 import { Ionicons } from '@expo/vector-icons';
-import { router, useLocalSearchParams } from 'expo-router';
-import { useEffect, useRef } from 'react';
+import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
+import { useCallback, useEffect, useRef } from 'react';
 import { FlatList, Text, TouchableOpacity, View } from 'react-native';
 
 export default function NotificationsScreen() {
-  const { messages, loading, load, markAsRead, markAllRead } = useMessageStore();
+  const { messages, loading, load, loadMessage, resolveMessageId, markAsRead, markAllRead } = useMessageStore();
   const { messageId } = useLocalSearchParams<{ messageId?: string }>();
   const openedMessageId = useRef<string | null>(null);
 
@@ -18,16 +18,27 @@ export default function NotificationsScreen() {
     }
   }, [messages.length, load]);
 
+  useFocusEffect(
+    useCallback(() => {
+      load();
+    }, [load]),
+  );
+
   useEffect(() => {
-    if (!messageId || loading || messages.length === 0 || openedMessageId.current === messageId) {
+    if (!messageId || loading || openedMessageId.current === messageId) {
       return;
     }
 
-    if (messages.some(message => String(message.id) === String(messageId))) {
-      openedMessageId.current = messageId;
-      openMessage(messageId);
-    }
-  }, [loading, messageId, messages]);
+    const openTarget = async () => {
+      await loadMessage(messageId);
+      const resolvedId = useMessageStore.getState().resolveMessageId(messageId);
+      if (useMessageStore.getState().messages.some((message) => String(message.id) === String(resolvedId))) {
+        openedMessageId.current = messageId;
+        openMessage(resolvedId);
+      }
+    };
+    openTarget();
+  }, [loading, loadMessage, messageId, messages]);
 
   const openMessage = (id: string) => {
     markAsRead(id);

@@ -18,6 +18,8 @@ export interface Message {
   category: MessageCategory;
   title: string;
   body: string;
+  /** URL изображения в плоском ответе API или push payload */
+  image_url?: string;
   /** Прочитано ли сообщение */
   is_read: boolean;
   /** ISO-дата создания */

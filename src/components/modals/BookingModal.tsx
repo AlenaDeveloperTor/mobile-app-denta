@@ -14,7 +14,7 @@ import { isValidPhone } from '@/utils/validators';
 import { Ionicons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
 import { router } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
     ActivityIndicator,
     Alert,
@@ -36,6 +36,7 @@ import { styles } from './BookingModal.styles';
  */
 export function BookingModal() {
   const { isOpen, initialServiceId, close } = useBookingModalStore();
+  const scrollViewRef = useRef<ScrollView>(null);
 
   const [services, setServices] = useState<Service[]>([]);
   const [servicesLoading, setServicesLoading] = useState(false);
@@ -120,6 +121,10 @@ export function BookingModal() {
     }
   };
 
+  const scrollToFocusedField = () => {
+    requestAnimationFrame(() => scrollViewRef.current?.scrollToEnd({ animated: true }));
+  };
+
   if (!isOpen) {
     return null;
   }
@@ -138,13 +143,15 @@ export function BookingModal() {
 
         <KeyboardAvoidingView
           style={styles.modalPositioner}
-          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
           pointerEvents="box-none"
         >
           <View style={styles.modalCard}>
             <ScrollView
+              ref={scrollViewRef}
               showsVerticalScrollIndicator={false}
               keyboardShouldPersistTaps="handled"
+              keyboardDismissMode="interactive"
             >
               <View style={styles.header}>
                 <Text style={styles.title}>✏️ Запись к врачу</Text>
@@ -207,6 +214,7 @@ export function BookingModal() {
                 keyboardType="phone-pad"
                 maxLength={18}
                 error={errors.phone}
+                onFocus={scrollToFocusedField}
               />
               <Input
                 label="Комментарий"
@@ -214,6 +222,7 @@ export function BookingModal() {
                 onChangeText={setComment}
                 placeholder="Дополнительные пожелания"
                 multiline
+                onFocus={scrollToFocusedField}
               />
 
               <Button

@@ -74,12 +74,15 @@ export function MessageDetailModal({ messageId }: MessageDetailModalProps) {
           <Text style={styles.title}>{message.title}</Text>
           <Text style={styles.date}>{formatDateTime(message.created_at)}</Text>
 
-          {message.banner?.image_url ? (
+          {(message.banner?.image_url ?? message.image_url) ? (
             <View
-              style={[styles.bannerWrap, { backgroundColor: message.banner.bg_color ?? '#007AFF' }]}
+              style={[
+                styles.bannerWrap,
+                { backgroundColor: message.banner?.bg_color ?? '#007AFF' },
+              ]}
             >
               <Image
-                source={{ uri: message.banner.image_url }}
+                source={{ uri: message.banner?.image_url ?? message.image_url }}
                 style={styles.bannerImage}
                 resizeMode="cover"
               />

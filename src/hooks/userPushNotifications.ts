@@ -2,6 +2,8 @@ import { pushAPI } from '@/api/push';
 import { STORAGE_KEYS } from '@/utils/constants';
 import { getDeviceId } from '@/utils/device';
 import { storage } from '@/utils/storage';
+import { useMessageStore } from '@/store/useMessageStore';
+import type { MessageCategory } from '@/types/message';
 import * as Device from 'expo-device';
 import * as Notifications from 'expo-notifications';
 import { router } from 'expo-router';
@@ -32,9 +34,10 @@ export function usePushNotifications(enabled = true) {
 
     registerForPushNotifications().then(setExpoPushToken);
 
-    const notificationListener = Notifications.addNotificationReceivedListener(n =>
-      setNotification(n)
-    );
+    const notificationListener = Notifications.addNotificationReceivedListener((n) => {
+      setNotification(n);
+      addNotificationToStore(n);
+    });
     const responseListener = Notifications.addNotificationResponseReceivedListener(response => {
       handleNotificationResponse(response, handledResponseIds.current);
     });
@@ -64,25 +67,37 @@ function handleNotificationResponse(
   }
   handledResponseIds.add(responseId);
 
-  const data = response.notification.request.content.data as Record<string, unknown> | undefined;
-  const messageId = data?.messageId ?? data?.id;
+  const messageId = addNotificationToStore(response.notification);
+  router.push({
+    pathname: '/notifications',
+    params: { messageId },
+  });
+}
 
-  if (typeof messageId === 'string') {
-    router.push({
-      pathname: '/notifications',
-      params: { messageId },
-    });
-    return;
-  }
+function addNotificationToStore(notification: Notifications.Notification): string {
+  const content = notification.request.content;
+  const data = content.data as Record<string, unknown> | undefined;
+  const hasServerId = data?.messageId ?? data?.message_id ?? data?.id;
+  const messageId = hasServerId ?? `local:${notification.request.identifier}`;
+  const title = typeof data?.title === 'string' ? data.title : content.title;
+  const body = typeof data?.body === 'string' ? data.body : content.body;
+  if (!title || !body) return String(messageId);
 
-  const url = data?.deep_link ?? data?.url;
-  if (typeof url === 'string') {
-    if (url === 'app://appointments') {
-      router.push('/(tabs)/appointments');
-      return;
-    }
-    router.push(url as never);
-  }
+  const category = data?.category;
+  const store = useMessageStore.getState();
+  if (store.messages.some((message) => String(message.id) === String(messageId))) return String(messageId);
+
+  const imageUrl = data?.image_url ?? data?.image;
+  store.addMessage({
+    id: String(messageId),
+    category: category === 'promo' || category === 'info' ? category : ('system' as MessageCategory),
+    title,
+    body,
+    image_url: typeof imageUrl === 'string' ? imageUrl : undefined,
+    is_read: false,
+    created_at: new Date().toISOString(),
+  });
+  return String(messageId);
 }
 
 async function registerForPushNotifications(): Promise<string | null> {
