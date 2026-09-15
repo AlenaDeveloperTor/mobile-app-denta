@@ -1,4 +1,4 @@
-export const APP_NAME = 'Denta';
+export const APP_NAME = 'labsmile';
 
 export const APP_VERSION = '1.0.0';
 

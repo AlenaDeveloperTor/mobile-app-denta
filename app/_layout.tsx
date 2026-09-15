@@ -1,4 +1,5 @@
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
+import { FONT } from '@/constants/theme';
 import { BookingModal } from '@/components/modals/BookingModal';
 import { usePushNotifications } from '@/hooks/userPushNotifications';
 import { useAuthStore } from '@/store/useAuthStore';
@@ -15,6 +16,7 @@ export default function RootLayout() {
   const [fontsLoaded] = useFonts({
     'Montserrat-Medium': require('../assets/fonts/Montserrat-Medium.ttf'),
     'Montserrat-Regular': require('../assets/fonts/Montserrat-Regular.ttf'),
+    SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
   });
 
   usePushNotifications(isAuthenticated);
@@ -41,7 +43,7 @@ export default function RootLayout() {
                 headerShown: true,
                 title: 'Уведомления',
                 headerStyle: { backgroundColor: '#F5F8FC' },
-                headerTitleStyle: { fontFamily: 'Montserrat-Medium', color: '#172933' },
+                headerTitleStyle: { fontFamily: FONT.medium, color: '#172933' },
               }}
             />
           </Stack.Protected>

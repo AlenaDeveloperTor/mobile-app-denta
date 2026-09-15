@@ -4,6 +4,7 @@ export type MessageCategory = 'promo' | 'system' | 'info';
 /** Баннер внутри сообщения (акция, новость и т.п.) */
 export interface MessageBanner {
   image_url?: string;
+  image?: string;
   /** Запасной цвет фона баннера, если картинка не загрузилась */
   bg_color?: string;
   button_text?: string;

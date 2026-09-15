@@ -1,4 +1,5 @@
 import { messagesAPI } from '@/api/messages';
+import { API_URL } from '@/config/env';
 import type { Message } from '@/types/message';
 import { create } from 'zustand';
 
@@ -26,7 +27,11 @@ interface MessageState {
 }
 
 function normalizeMessage(message: Message): Message {
-  const imageUrl = message.banner?.image_url ?? message.image_url;
+  const imageUrl = normalizeImageUrl(
+    message.banner?.image_url ??
+      message.banner?.image ??
+    message.image_url,
+  );
   const banner = imageUrl
     ? { ...message.banner, image_url: imageUrl }
     : message.banner;
@@ -37,6 +42,20 @@ function normalizeMessage(message: Message): Message {
   return isAppointment && message.category === 'promo'
     ? { ...message, banner, category: 'system' }
     : { ...message, banner };
+}
+
+function normalizeImageUrl(value: unknown): string | undefined {
+  if (typeof value !== 'string' || !value.trim()) return undefined;
+  const source = value.trim();
+  if (/^https?:\/\//i.test(source)) {
+    return source;
+  }
+  try {
+    const origin = new URL(API_URL).origin;
+    return new URL(source.startsWith('/') ? source : `/${source}`, `${origin}/`).toString();
+  } catch {
+    return undefined;
+  }
 }
 
 function sortMessages(messages: Message[]): Message[] {

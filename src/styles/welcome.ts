@@ -10,13 +10,11 @@ export const styles = StyleSheet.create({
     backgroundColor: COLORS.dark,
   },
   logoCircle: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
+    width: 240,
+    height: 72,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 28,
-    overflow: 'hidden',
   },
   title: {
     fontSize: 28,

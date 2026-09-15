@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { Tabs } from 'expo-router';
-import { COLORS } from '@/constants/theme';
+import { COLORS, FONT } from '@/constants/theme';
 
 export default function TabsLayout() {
   return (
@@ -25,7 +25,7 @@ export default function TabsLayout() {
           shadowOpacity: 0.06,
         },
         headerTitleStyle: {
-          fontFamily: 'Montserrat-Medium',
+          fontFamily: FONT.medium,
           color: COLORS.dark,
           fontSize: 18,
         },

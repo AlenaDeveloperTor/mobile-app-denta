@@ -66,6 +66,7 @@ export const RADIUS = {
 export const FONT = {
   medium: 'Montserrat-Medium',
   regular: 'Montserrat-Regular',
+  mono: 'SpaceMono',
 } as const;
 
 export const SHADOW = {

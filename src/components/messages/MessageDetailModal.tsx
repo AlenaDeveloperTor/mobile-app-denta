@@ -29,12 +29,14 @@ export function MessageDetailModal({ messageId }: MessageDetailModalProps) {
   const markAsRead = useMessageStore((s) => s.markAsRead);
   const openBooking = useBookingModalStore((s) => s.open);
   const [message, setMessage] = useState<Message | undefined>();
+  const [imageFailed, setImageFailed] = useState(false);
 
   useEffect(() => {
     // Бэкенд возвращает id как integer, URL-параметр — строка.
     // Сравниваем через String() чтобы избежать несовпадения типов.
     const found = messages.find((m) => String(m.id) === String(messageId));
     setMessage(found);
+    setImageFailed(false);
     if (found && !found.is_read) {
       markAsRead(found.id);
     }
@@ -74,7 +76,7 @@ export function MessageDetailModal({ messageId }: MessageDetailModalProps) {
           <Text style={styles.title}>{message.title}</Text>
           <Text style={styles.date}>{formatDateTime(message.created_at)}</Text>
 
-          {(message.banner?.image_url ?? message.image_url) ? (
+          {(message.banner?.image_url ?? message.banner?.image ?? message.image_url) && !imageFailed ? (
             <View
               style={[
                 styles.bannerWrap,
@@ -82,9 +84,15 @@ export function MessageDetailModal({ messageId }: MessageDetailModalProps) {
               ]}
             >
               <Image
-                source={{ uri: message.banner?.image_url ?? message.image_url }}
+                source={{
+                  uri:
+                    message.banner?.image_url ??
+                    message.banner?.image ??
+                    message.image_url,
+                }}
                 style={styles.bannerImage}
                 resizeMode="cover"
+                onError={() => setImageFailed(true)}
               />
             </View>
           ) : null}

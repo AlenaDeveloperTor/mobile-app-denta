@@ -87,7 +87,8 @@ function addNotificationToStore(notification: Notifications.Notification): strin
   const store = useMessageStore.getState();
   if (store.messages.some((message) => String(message.id) === String(messageId))) return String(messageId);
 
-  const imageUrl = data?.image_url ?? data?.image;
+  const richContent = data?.richContent as Record<string, unknown> | undefined;
+  const imageUrl = data?.image_url ?? data?.image ?? richContent?.image;
   store.addMessage({
     id: String(messageId),
     category: category === 'promo' || category === 'info' ? category : ('system' as MessageCategory),
