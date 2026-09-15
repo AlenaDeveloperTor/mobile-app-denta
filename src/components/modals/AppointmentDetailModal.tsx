@@ -1,5 +1,6 @@
-import { Button } from '@/components/common/Button';
+import { useAppointmentStore } from '@/store/useAppointmentStore';
 import { appointmentsAPI } from '@/api/appointments';
+import { Button } from '@/components/common/Button';
 import type { Appointment, AppointmentStatus } from '@/types/appointment';
 import { formatDate, formatDateTime } from '@/utils/formatters';
 import { Ionicons } from '@expo/vector-icons';
@@ -21,8 +22,15 @@ interface AppointmentDetailModalProps {
 }
 
 export function AppointmentDetailModal({ appointmentId }: AppointmentDetailModalProps) {
-	const [appointment, setAppointment] = useState<Appointment | null>(null);
-	const [loading, setLoading] = useState(true);
+	const storeAppointments = useAppointmentStore((s) => s.appointments);
+	const setStoreAppointments = useAppointmentStore((s) => s.setAppointments);
+
+	const foundInStore = storeAppointments.find(
+		(a) => String(a.id) === String(appointmentId)
+	);
+
+	const [appointment, setAppointment] = useState<Appointment | null>(foundInStore ?? null);
+	const [loading, setLoading] = useState(!foundInStore);
 	const [error, setError] = useState(false);
 
 	useEffect(() => {
@@ -34,9 +42,29 @@ export function AppointmentDetailModal({ appointmentId }: AppointmentDetailModal
 				setError(true);
 				return;
 			}
+
+			if (foundInStore) {
+				setAppointment(foundInStore);
+				setLoading(false);
+				return;
+			}
+
 			try {
-				const response = await appointmentsAPI.getById(appointmentId);
-				if (active) setAppointment(response.data);
+				const response = await appointmentsAPI.getList();
+				const items = response.data;
+				if (Array.isArray(items)) {
+					setStoreAppointments(items);
+					const item = items.find((a) => String(a.id) === String(appointmentId));
+					if (active) {
+						if (item) {
+							setAppointment(item);
+						} else {
+							setError(true);
+						}
+					}
+				} else if (active) {
+					setError(true);
+				}
 			} catch {
 				if (active) setError(true);
 			} finally {
@@ -48,7 +76,7 @@ export function AppointmentDetailModal({ appointmentId }: AppointmentDetailModal
 		return () => {
 			active = false;
 		};
-	}, [appointmentId]);
+	}, [appointmentId, foundInStore, setStoreAppointments]);
 
 	if (loading) {
 		return (

@@ -88,13 +88,50 @@ function addNotificationToStore(notification: Notifications.Notification): strin
   if (store.messages.some((message) => String(message.id) === String(messageId))) return String(messageId);
 
   const richContent = data?.richContent as Record<string, unknown> | undefined;
-  const imageUrl = data?.image_url ?? data?.image ?? richContent?.image;
+  const rawBanner = (typeof data?.banner === 'string'
+    ? (() => {
+        try {
+          return JSON.parse(data.banner as string);
+        } catch {
+          return undefined;
+        }
+      })()
+    : data?.banner) as Record<string, unknown> | undefined;
+
+  const rawAttachments = (content as Record<string, unknown>).attachments;
+  const attachmentUrl = Array.isArray(rawAttachments) && rawAttachments[0]?.url
+    ? (rawAttachments[0].url as string)
+    : undefined;
+
+  const imageUrl =
+    rawBanner?.image_url ??
+    rawBanner?.image ??
+    data?.image_url ??
+    data?.imageUrl ??
+    data?.image ??
+    data?.picture ??
+    data?.banner_url ??
+    richContent?.image ??
+    attachmentUrl;
+
+  const bannerObj =
+    (typeof imageUrl === 'string' && imageUrl) || rawBanner
+      ? {
+          image_url: typeof imageUrl === 'string' ? imageUrl : undefined,
+          title: typeof rawBanner?.title === 'string' ? rawBanner.title : undefined,
+          subtitle: typeof rawBanner?.subtitle === 'string' ? rawBanner.subtitle : undefined,
+          button_text: typeof rawBanner?.button_text === 'string' ? rawBanner.button_text : undefined,
+          bg_color: typeof rawBanner?.bg_color === 'string' ? rawBanner.bg_color : undefined,
+        }
+      : undefined;
+
   store.addMessage({
     id: String(messageId),
     category: category === 'promo' || category === 'info' ? category : ('system' as MessageCategory),
     title,
     body,
     image_url: typeof imageUrl === 'string' ? imageUrl : undefined,
+    banner: bannerObj,
     is_read: false,
     created_at: new Date().toISOString(),
   });

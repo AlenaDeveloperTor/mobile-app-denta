@@ -34,11 +34,18 @@ export function MessageDetailModal({ messageId }: MessageDetailModalProps) {
   useEffect(() => {
     // Бэкенд возвращает id как integer, URL-параметр — строка.
     // Сравниваем через String() чтобы избежать несовпадения типов.
-    const found = messages.find((m) => String(m.id) === String(messageId));
-    setMessage(found);
-    setImageFailed(false);
-    if (found && !found.is_read) {
-      markAsRead(found.id);
+    const resolvedId = useMessageStore.getState().resolveMessageId(messageId ?? '');
+    const found = messages.find(
+      (m) => String(m.id) === String(messageId) || String(m.id) === String(resolvedId)
+    );
+    if (found) {
+      setMessage(found);
+      setImageFailed(false);
+      if (!found.is_read) {
+        markAsRead(found.id);
+      }
+    } else if (messageId) {
+      useMessageStore.getState().loadMessage(messageId);
     }
   }, [messages, messageId, markAsRead]);
 
@@ -60,6 +67,8 @@ export function MessageDetailModal({ messageId }: MessageDetailModalProps) {
     );
   }
 
+  const bannerImageUrl = message.banner?.image_url ?? message.banner?.image ?? message.image_url;
+
   return (
     <View style={styles.modalContainer}>
       <View style={styles.modalContent}>
@@ -76,24 +85,21 @@ export function MessageDetailModal({ messageId }: MessageDetailModalProps) {
           <Text style={styles.title}>{message.title}</Text>
           <Text style={styles.date}>{formatDateTime(message.created_at)}</Text>
 
-          {(message.banner?.image_url ?? message.banner?.image ?? message.image_url) && !imageFailed ? (
+          {bannerImageUrl ? (
             <View
               style={[
                 styles.bannerWrap,
                 { backgroundColor: message.banner?.bg_color ?? '#007AFF' },
               ]}
             >
-              <Image
-                source={{
-                  uri:
-                    message.banner?.image_url ??
-                    message.banner?.image ??
-                    message.image_url,
-                }}
-                style={styles.bannerImage}
-                resizeMode="cover"
-                onError={() => setImageFailed(true)}
-              />
+              {!imageFailed && (
+                <Image
+                  source={{ uri: bannerImageUrl }}
+                  style={styles.bannerImage}
+                  resizeMode="cover"
+                  onError={() => setImageFailed(true)}
+                />
+              )}
             </View>
           ) : null}
 

@@ -108,6 +108,15 @@ export const useMessageStore = create<MessageState>((set, get) => ({
           const serverMatch = items.find((serverItem) => samePush(item, serverItem));
           if (serverMatch && isLocalMessage(item)) {
             aliases[item.id] = String(serverMatch.id);
+            // Если у серверного сообщения нет баннера/картинки, но локальный пуш содержал её — сохраняем
+            if (!serverMatch.banner?.image_url && (item.banner?.image_url || item.image_url)) {
+              serverMatch.banner = {
+                ...(serverMatch.banner ?? {}),
+                ...(item.banner ?? {}),
+                image_url: item.banner?.image_url || item.image_url,
+              };
+              serverMatch.image_url = item.image_url || item.banner?.image_url;
+            }
             return false;
           }
           return true;
@@ -149,9 +158,20 @@ export const useMessageStore = create<MessageState>((set, get) => ({
     try {
       const res = await messagesAPI.getById(id);
       const message = normalizeMessage(res.data);
+      const existing = get().messages.find(
+        (m) => String(m.id) === String(id) || get().messageAliases[m.id] === String(id)
+      );
+      if (existing && !message.banner?.image_url && (existing.banner?.image_url || existing.image_url)) {
+        message.banner = {
+          ...(message.banner ?? {}),
+          ...(existing.banner ?? {}),
+          image_url: existing.banner?.image_url || existing.image_url,
+        };
+        message.image_url = existing.image_url || existing.banner?.image_url;
+      }
       set((state) => ({
         messages: state.messages.some((item) => String(item.id) === String(message.id))
-          ? state.messages
+          ? state.messages.map((item) => (String(item.id) === String(message.id) ? message : item))
           : [message, ...state.messages],
       }));
     } catch {
