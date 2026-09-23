@@ -9,8 +9,9 @@ export const styles = StyleSheet.create({
   },
   /** Внутренний слой для Primary (LinearGradient) */
   primaryInner: {
-    paddingVertical: 15,
-    paddingHorizontal: 20,
+    minHeight: 48,
+    paddingVertical: 11,
+    paddingHorizontal: 14,
     alignItems: 'center',
     justifyContent: 'center',
     flexDirection: 'row',
@@ -18,8 +19,9 @@ export const styles = StyleSheet.create({
   },
   /** Внутренний слой для Secondary */
   secondary: {
-    paddingVertical: 14,
-    paddingHorizontal: 20,
+    minHeight: 48,
+    paddingVertical: 10,
+    paddingHorizontal: 14,
     alignItems: 'center',
     justifyContent: 'center',
     flexDirection: 'row',
@@ -33,7 +35,9 @@ export const styles = StyleSheet.create({
   },
   text: {
     color: COLORS.dark,
-    fontSize: 16,
+    flexShrink: 1,
+    textAlign: 'center',
+    fontSize: 15,
     fontFamily: FONT.medium,
     letterSpacing: 0.3,
   },

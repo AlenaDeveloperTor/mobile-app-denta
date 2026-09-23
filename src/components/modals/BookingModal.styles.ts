@@ -1,10 +1,7 @@
-import { Dimensions, StyleSheet } from 'react-native';
+import { StyleSheet } from 'react-native';
 import { COLORS, FONT, RADIUS, SHADOW } from '@/constants/theme';
 
-const SCREEN_WIDTH = Dimensions.get('window').width;
 const CARD_GAP = 10;
-const CARD_HORIZONTAL_PADDING = 20; // padding inside modalCard on each side
-const CARD_WIDTH = (SCREEN_WIDTH - 40 - CARD_HORIZONTAL_PADDING * 2 - CARD_GAP) / 2;
 
 export const styles = StyleSheet.create({
   overlay: {
@@ -39,6 +36,7 @@ export const styles = StyleSheet.create({
   modalCard: {
     width: '100%',
     maxWidth: 420,
+    height: '90%',
     maxHeight: '90%',
     backgroundColor: COLORS.white,
     borderRadius: RADIUS.card,
@@ -71,23 +69,40 @@ export const styles = StyleSheet.create({
     color: COLORS.dark,
     flex: 1,
   },
+  label: {
+    fontSize: 14,
+    fontFamily: FONT.medium,
+    color: COLORS.dark,
+    marginHorizontal: 20,
+    marginBottom: 12,
+  },
   closeButton: {
     padding: 4,
   },
+  stepContainer: {
+    flex: 1,
+    maxHeight: '100%',
+  },
 
   // ─── Step 1: Service Grid ──────────────────────────────────
-  gridScrollContent: {
+  serviceStep: {
+    flex: 1,
+  },
+  serviceList: {
+    flex: 1,
+  },
+  serviceGrid: {
     paddingHorizontal: 20,
     paddingBottom: 20,
   },
   gridRow: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    gap: CARD_GAP,
     marginBottom: CARD_GAP,
   },
   serviceCard: {
-    width: CARD_WIDTH,
-    height: CARD_WIDTH * 1.15,
+    flex: 1,
+    aspectRatio: 0.88,
     borderRadius: RADIUS.block,
     overflow: 'hidden',
     backgroundColor: COLORS.blueTint,
@@ -103,15 +118,21 @@ export const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    paddingHorizontal: 10,
-    paddingBottom: 10,
-    paddingTop: 28,
+    paddingHorizontal: 12,
+    paddingBottom: 12,
+    paddingTop: 32,
   },
   serviceCardName: {
     fontSize: 13,
     fontFamily: FONT.medium,
     color: COLORS.white,
     lineHeight: 17,
+  },
+  serviceCardPrice: {
+    fontSize: 12,
+    fontFamily: FONT.regular,
+    color: 'rgba(255,255,255,0.9)',
+    marginTop: 3,
   },
   loadingContainer: {
     paddingVertical: 48,
@@ -130,7 +151,7 @@ export const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingBottom: 20,
   },
-  selectedChip: {
+  selectedServiceChip: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: COLORS.blueTint,

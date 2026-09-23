@@ -21,7 +21,7 @@ export const DEFAULT_MESSAGES: Message[] = [
     is_read: false,
     created_at: '2026-08-09T10:00:00.000Z',
     banner: {
-      image_url: 'https://picsum.photos/seed/denta-imp/800/400',
+      image_url: '',
       bg_color: '#0A7DFF',
       button_text: 'Записаться',
     },
@@ -34,7 +34,7 @@ export const DEFAULT_MESSAGES: Message[] = [
     is_read: false,
     created_at: '2026-08-08T09:00:00.000Z',
     banner: {
-      image_url: 'https://picsum.photos/seed/denta-news/800/400',
+      image_url: '',
       bg_color: '#2E7D32',
       button_text: 'Подробнее',
     },
@@ -55,7 +55,7 @@ export const DEFAULT_MESSAGES: Message[] = [
     is_read: false,
     created_at: '2026-08-06T14:00:00.000Z',
     banner: {
-      image_url: 'https://picsum.photos/seed/denta-ct/800/400',
+      image_url: '',
       bg_color: '#FF6B35',
       button_text: 'Записаться',
     },

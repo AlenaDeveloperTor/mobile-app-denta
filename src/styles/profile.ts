@@ -97,11 +97,12 @@ export const styles = StyleSheet.create({
   },
   editFormButtons: {
     flexDirection: 'row',
-    gap: 10,
-    marginTop: 18,
+    gap: 8,
+    marginTop: 16,
   },
   editFormBtn: {
     flex: 1,
+    minWidth: 0,
   },
 
   // ── Карточка бонусного баланса ─────────────────────────────────────────

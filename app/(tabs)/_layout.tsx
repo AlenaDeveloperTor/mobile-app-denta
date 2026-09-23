@@ -1,8 +1,11 @@
 import { Ionicons } from '@expo/vector-icons';
 import { Tabs } from 'expo-router';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { COLORS, FONT } from '@/constants/theme';
 
 export default function TabsLayout() {
+  const insets = useSafeAreaInsets();
+
   return (
     <Tabs
       screenOptions={{
@@ -18,6 +21,17 @@ export default function TabsLayout() {
           shadowOpacity: 0.06,
           shadowRadius: 8,
           elevation: 8,
+          height: 62 + insets.bottom,
+          paddingBottom: Math.max(insets.bottom, 6),
+          paddingTop: 4,
+        },
+        tabBarLabelStyle: {
+          fontFamily: FONT.regular,
+          fontSize: 11,
+          lineHeight: 14,
+        },
+        tabBarItemStyle: {
+          minHeight: 48,
         },
         headerStyle: {
           backgroundColor: COLORS.white,
@@ -48,16 +62,6 @@ export default function TabsLayout() {
           title: 'Мои записи',
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="calendar-outline" size={size} color={color} />
-          ),
-        }}
-      />
-
-      <Tabs.Screen
-        name="news"
-        options={{
-          title: 'Новости',
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="newspaper-outline" size={size} color={color} />
           ),
         }}
       />

@@ -1,13 +1,12 @@
 import { servicesAPI } from '@/api/services';
 import { Button } from '@/components/common/Button';
-import { PromoSection } from '@/components/home/PromoSection';
 import { VerticalBannerList } from '@/components/home/VerticalBannerList';
 import { DEFAULT_BANNERS } from '@/data/banners';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useBookingModalStore } from '@/store/useBookingModalStore';
 import { useMessageStore } from '@/store/useMessageStore';
 import { styles } from '@/styles/home';
-import type { Banner, Promo } from '@/types/service';
+import type { Banner } from '@/types/service';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
@@ -22,7 +21,6 @@ export default function HomeScreen() {
   const unreadCount = useMessageStore((s) => s.unreadCount);
   const loadUnreadCount = useMessageStore((s) => s.loadUnreadCount);
   const [banners, setBanners] = useState<Banner[]>([]);
-  const [promos, setPromos] = useState<Promo[]>([]);
   const [loading, setLoading] = useState(true);
 
   // Загрузка данных с API
@@ -32,17 +30,11 @@ export default function HomeScreen() {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const [bannersRes, promosRes] = await Promise.allSettled([
-          servicesAPI.getBanners(),
-          servicesAPI.getPromos(),
-        ]);
+        const bannersRes = await servicesAPI.getBanners();
         if (!isMounted) return;
 
-        if (bannersRes.status === 'fulfilled' && Array.isArray(bannersRes.value.data)) {
-          setBanners(bannersRes.value.data);
-        }
-        if (promosRes.status === 'fulfilled' && Array.isArray(promosRes.value.data)) {
-          setPromos(promosRes.value.data);
+        if (Array.isArray(bannersRes.data)) {
+          setBanners(bannersRes.data);
         }
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -114,8 +106,6 @@ export default function HomeScreen() {
         {/* Вертикальный список баннеров */}
         <VerticalBannerList banners={displayBanners} />
 
-        {/* Акции (раздел скрывается, если акций нет) */}
-        <PromoSection promos={promos} />
       </ScrollView>
 
       {/* Кнопка «Записаться» — прижата к нижней навигационной панели */}
