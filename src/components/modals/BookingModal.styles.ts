@@ -1,5 +1,10 @@
-import { StyleSheet } from 'react-native';
+import { Dimensions, StyleSheet } from 'react-native';
 import { COLORS, FONT, RADIUS, SHADOW } from '@/constants/theme';
+
+const SCREEN_WIDTH = Dimensions.get('window').width;
+const CARD_GAP = 10;
+const CARD_HORIZONTAL_PADDING = 20; // padding inside modalCard on each side
+const CARD_WIDTH = (SCREEN_WIDTH - 40 - CARD_HORIZONTAL_PADDING * 2 - CARD_GAP) / 2;
 
 export const styles = StyleSheet.create({
   overlay: {
@@ -37,81 +42,133 @@ export const styles = StyleSheet.create({
     maxHeight: '90%',
     backgroundColor: COLORS.white,
     borderRadius: RADIUS.card,
-    padding: 24,
+    overflow: 'hidden',
     ...SHADOW.medium,
   },
+
+  // ─── Header ───────────────────────────────────────────────
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 18,
+    paddingHorizontal: 20,
+    paddingTop: 20,
+    paddingBottom: 14,
+  },
+  headerLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+    marginRight: 8,
+  },
+  backButton: {
+    padding: 4,
+    marginRight: 8,
   },
   title: {
-    fontSize: 22,
+    fontSize: 20,
     fontFamily: FONT.medium,
     color: COLORS.dark,
     flex: 1,
-    marginRight: 8,
   },
   closeButton: {
     padding: 4,
   },
-  label: {
-    fontSize: 13,
-    fontFamily: FONT.medium,
-    marginBottom: 8,
-    color: COLORS.dark,
+
+  // ─── Step 1: Service Grid ──────────────────────────────────
+  gridScrollContent: {
+    paddingHorizontal: 20,
+    paddingBottom: 20,
   },
-  serviceList: {
-    marginBottom: 16,
-  },
-  serviceItem: {
+  gridRow: {
     flexDirection: 'row',
-    alignItems: 'center',
-    borderWidth: 1.5,
-    borderColor: 'rgba(170,198,238,0.4)',
+    justifyContent: 'space-between',
+    marginBottom: CARD_GAP,
+  },
+  serviceCard: {
+    width: CARD_WIDTH,
+    height: CARD_WIDTH * 1.15,
     borderRadius: RADIUS.block,
-    padding: 12,
-    marginBottom: 8,
-    backgroundColor: '#FAFCFF',
-  },
-  serviceItemSelected: {
-    borderColor: COLORS.blue,
+    overflow: 'hidden',
     backgroundColor: COLORS.blueTint,
+    ...SHADOW.soft,
   },
-  serviceInfo: {
-    flex: 1,
-    marginRight: 8,
+  serviceCardImage: {
+    width: '100%',
+    height: '100%',
+    resizeMode: 'cover',
   },
-  serviceName: {
-    fontSize: 15,
-    fontFamily: FONT.medium,
-    color: COLORS.dark,
-    marginBottom: 2,
+  serviceCardOverlay: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    paddingHorizontal: 10,
+    paddingBottom: 10,
+    paddingTop: 28,
   },
-  serviceMeta: {
+  serviceCardName: {
     fontSize: 13,
-    fontFamily: FONT.regular,
-    color: COLORS.textSecondary,
+    fontFamily: FONT.medium,
+    color: COLORS.white,
+    lineHeight: 17,
   },
   loadingContainer: {
-    paddingVertical: 24,
+    paddingVertical: 48,
     alignItems: 'center',
-    marginBottom: 16,
   },
   emptyText: {
     fontSize: 14,
     fontFamily: FONT.regular,
     color: COLORS.textSecondary,
     textAlign: 'center',
-    paddingVertical: 16,
-    marginBottom: 16,
+    paddingVertical: 32,
+  },
+
+  // ─── Step 2: Form ──────────────────────────────────────────
+  formScrollContent: {
+    paddingHorizontal: 20,
+    paddingBottom: 20,
+  },
+  selectedChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: COLORS.blueTint,
+    borderRadius: RADIUS.block,
+    marginBottom: 18,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: 'rgba(170,198,238,0.5)',
+  },
+  chipImage: {
+    width: 64,
+    height: 64,
+    resizeMode: 'cover',
+  },
+  chipInfo: {
+    flex: 1,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+  },
+  chipLabel: {
+    fontSize: 11,
+    fontFamily: FONT.regular,
+    color: COLORS.textSecondary,
+    marginBottom: 2,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  chipName: {
+    fontSize: 14,
+    fontFamily: FONT.medium,
+    color: COLORS.dark,
   },
   errorText: {
     color: COLORS.error,
     fontFamily: FONT.regular,
     fontSize: 12,
     marginBottom: 8,
+    marginTop: -4,
   },
   cancelButton: {
     marginTop: 10,
