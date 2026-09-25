@@ -2,6 +2,7 @@
   "expo": {
     "name": "mobile-app-denta",
     "slug": "mobile-app-denta",
+    "icon": "./assets/images/logo.png",
     "version": "1.0.0",
     "orientation": "portrait",
     "scheme": "mobileappdenta",
@@ -12,7 +13,11 @@
     "android": {
       "predictiveBackGestureEnabled": false,
       "package": "com.romchik_programmist.mobileappdenta",
-      "googleServicesFile": "./google-services.json"
+      "googleServicesFile": "./google-services.json",
+       "adaptiveIcon": {
+        "foregroundImage": "./assets/images/logo.png",
+        "backgroundColor": "#FFFFFF"
+      }
     },
     "web": {
       "bundler": "metro",

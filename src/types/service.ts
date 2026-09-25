@@ -14,6 +14,7 @@ export interface Banner {
   subtitle: string;
   image_url: string;
   button_text: string;
+  button_url?: string;
   /** Запасной цвет фона слайда, если картинка не загрузилась (опционально) */
   bg_color?: string;
 }

@@ -1,7 +1,6 @@
-import { useBookingModalStore } from '@/store/useBookingModalStore';
 import type { Banner } from '@/types/service';
 import { useEffect, useRef, useState } from 'react';
-import { Dimensions, FlatList, Image, Text, TouchableOpacity, View } from 'react-native';
+import { Dimensions, FlatList, Image, Linking, Text, TouchableOpacity, View } from 'react-native';
 import { styles } from './BannerCarousel.styles';
 
 const { width } = Dimensions.get('window');
@@ -12,7 +11,6 @@ interface BannerCarouselProps {
 
 export function BannerCarousel({ banners }: BannerCarouselProps) {
   const [activeIndex, setActiveIndex] = useState(0);
-  const openBooking = useBookingModalStore((s) => s.open);
   const flatListRef = useRef<FlatList<Banner>>(null);
 
   // Автопрокрутка каждые 5 секунд
@@ -39,10 +37,6 @@ export function BannerCarousel({ banners }: BannerCarouselProps) {
     return null;
   }
 
-  const handleBannerPress = () => {
-    openBooking();
-  };
-
   // getItemLayout: вычисляет размер и позицию каждого элемента
   // Обязателен для scrollToIndex
   const getItemLayout = (_data: ArrayLike<Banner> | null | undefined, index: number) => ({
@@ -64,22 +58,28 @@ export function BannerCarousel({ banners }: BannerCarouselProps) {
   };
 
   const renderBanner = ({ item }: { item: Banner }) => (
-    <TouchableOpacity
+    <View
       style={[styles.bannerSlide, { backgroundColor: item.bg_color ?? '#007AFF' }]}
-      onPress={handleBannerPress}
-      activeOpacity={0.9}
     >
       <Image source={{ uri: item.image_url }} style={styles.bannerImage} resizeMode="cover" />
       <View style={styles.bannerOverlay}>
         <View style={styles.bannerTextContainer}>
           <Text style={styles.bannerTitle}>{item.title}</Text>
           <Text style={styles.bannerSubtitle}>{item.subtitle}</Text>
-          <View style={styles.bannerButton}>
+          <TouchableOpacity
+            style={styles.bannerButton}
+            onPress={() => {
+              if (item.button_url) {
+                void Linking.openURL(item.button_url);
+              }
+            }}
+            activeOpacity={0.8}
+          >
             <Text style={styles.bannerButtonText}>{item.button_text}</Text>
-          </View>
+          </TouchableOpacity>
         </View>
       </View>
-    </TouchableOpacity>
+    </View>
   );
 
   const renderDot = (index: number) => (

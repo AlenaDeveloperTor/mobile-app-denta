@@ -3,8 +3,6 @@ import React, { useState } from 'react';
 import { Image, Linking, Text, TouchableOpacity, View } from 'react-native';
 import { styles } from './VerticalBannerList.styles';
 
-const BANNER_LINK = 'https://labsmile22.ru/?ysclid=muejyoo3bu837002956';
-
 interface VerticalBannerListProps {
   banners: Banner[];
 }
@@ -45,7 +43,11 @@ function BannerItem({ item }: BannerItemProps) {
           {Boolean(item.button_text) && (
             <TouchableOpacity
               style={styles.bannerButton}
-              onPress={() => Linking.openURL(BANNER_LINK)}
+              onPress={() => {
+                if (item.button_url) {
+                  void Linking.openURL(item.button_url);
+                }
+              }}
               activeOpacity={0.8}
             >
               <Text style={styles.bannerButtonText}>{item.button_text}</Text>
