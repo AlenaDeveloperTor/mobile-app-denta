@@ -1,5 +1,4 @@
 import { servicesAPI } from '@/api/services';
-import { Button } from '@/components/common/Button';
 import { VerticalBannerList } from '@/components/home/VerticalBannerList';
 import { DEFAULT_BANNERS } from '@/data/banners';
 import { useAuthStore } from '@/store/useAuthStore';
@@ -8,10 +7,12 @@ import { useMessageStore } from '@/store/useMessageStore';
 import { styles } from '@/styles/home';
 import type { Banner } from '@/types/service';
 import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
-import { useEffect, useState } from 'react';
-import { ActivityIndicator, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { useEffect, useRef, useState } from 'react';
+import { Animated, ActivityIndicator, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { GRADIENT, COLORS, FONT, RADIUS } from '@/constants/theme';
 
 // ОСНОВНОЙ КОМПОНЕНТ - Главный экран
 export default function HomeScreen() {
@@ -22,6 +23,49 @@ export default function HomeScreen() {
   const loadUnreadCount = useMessageStore((s) => s.loadUnreadCount);
   const [banners, setBanners] = useState<Banner[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // Пульсация кнопки «Записаться» — мягкая, ненавязчивая
+  const pulseAnim = useRef(new Animated.Value(1)).current;
+
+  useEffect(() => {
+    let timer: ReturnType<typeof setTimeout>;
+
+    const pulse = () => {
+      Animated.sequence([
+        Animated.timing(pulseAnim, {
+          toValue: 1.038,
+          duration: 320,
+          useNativeDriver: true,
+        }),
+        Animated.timing(pulseAnim, {
+          toValue: 1,
+          duration: 320,
+          useNativeDriver: true,
+        }),
+        Animated.timing(pulseAnim, {
+          toValue: 1.022,
+          duration: 200,
+          useNativeDriver: true,
+        }),
+        Animated.timing(pulseAnim, {
+          toValue: 1,
+          duration: 200,
+          useNativeDriver: true,
+        }),
+      ]).start(() => {
+        // Следующая пульсация через 4 секунды
+        timer = setTimeout(pulse, 4000);
+      });
+    };
+
+    // Первая пульсация с задержкой 2 сек после монтирования
+    timer = setTimeout(pulse, 2000);
+
+    return () => {
+      clearTimeout(timer);
+      pulseAnim.stopAnimation();
+    };
+  }, [pulseAnim]);
 
   // Загрузка данных с API
   useEffect(() => {
@@ -110,7 +154,41 @@ export default function HomeScreen() {
 
       {/* Кнопка «Записаться» — прижата к нижней навигационной панели */}
       <View style={styles.stickyBottomBar}>
-        <Button title="✏️ Записаться" onPress={() => openBooking()} />
+        <Animated.View style={{ transform: [{ scale: pulseAnim }] }}>
+          <TouchableOpacity
+            onPress={() => openBooking()}
+            activeOpacity={0.82}
+            style={{ borderRadius: RADIUS.pill, overflow: 'hidden' }}
+          >
+            <LinearGradient
+              colors={GRADIENT.colors}
+              start={GRADIENT.start}
+              end={GRADIENT.end}
+              style={{
+                minHeight: 52,
+                paddingVertical: 13,
+                paddingHorizontal: 28,
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexDirection: 'row',
+                gap: 10,
+                borderRadius: RADIUS.pill,
+              }}
+            >
+              <Ionicons name="calendar-outline" size={20} color={COLORS.dark} />
+              <Text
+                style={{
+                  color: COLORS.dark,
+                  fontSize: 16,
+                  fontFamily: FONT.medium,
+                  letterSpacing: 0.4,
+                }}
+              >
+                Записаться
+              </Text>
+            </LinearGradient>
+          </TouchableOpacity>
+        </Animated.View>
       </View>
     </View>
   );

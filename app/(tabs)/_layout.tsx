@@ -1,10 +1,15 @@
 import { Ionicons } from '@expo/vector-icons';
 import { Tabs } from 'expo-router';
+import { TouchableOpacity } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { COLORS, FONT } from '@/constants/theme';
+import { useAppointmentStore } from '@/store/useAppointmentStore';
+import { useBookingModalStore } from '@/store/useBookingModalStore';
 
 export default function TabsLayout() {
   const insets = useSafeAreaInsets();
+  const hasAppointments = useAppointmentStore((state) => state.appointments.length > 0);
+  const openBooking = useBookingModalStore((state) => state.open);
 
   return (
     <Tabs
@@ -60,6 +65,19 @@ export default function TabsLayout() {
         name="appointments"
         options={{
           title: 'Мои записи',
+          headerRight: hasAppointments
+            ? () => (
+                <TouchableOpacity
+                  onPress={() => openBooking()}
+                  accessibilityRole="button"
+                  accessibilityLabel="Записаться"
+                  hitSlop={10}
+                  style={{ padding: 8, marginRight: 4 }}
+                >
+                  <Ionicons name="add-circle-outline" size={26} color={COLORS.dark} />
+                </TouchableOpacity>
+              )
+            : undefined,
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="calendar-outline" size={size} color={color} />
           ),
