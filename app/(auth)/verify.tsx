@@ -32,8 +32,12 @@ export default function VerifyScreen() {
 
     setLoading(true);
     try {
-      await verifyCode(session_id, code.trim());
-      router.replace('/(tabs)');
+      const needsBirthDate = await verifyCode(session_id, code.trim());
+      if (needsBirthDate) {
+        router.replace('/(auth)/birth-date');
+      } else {
+        router.replace('/(tabs)');
+      }
     } catch (error) {
       // Распознаём стандартизированную ошибку сервера
       const apiCode = axios.isAxiosError(error)

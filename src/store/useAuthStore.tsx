@@ -12,7 +12,8 @@ interface AuthState {
   isAuthenticated: boolean;
   checkAuth: () => Promise<void>;
   requestCode: (phone: string) => Promise<CodeRequestResponse>;
-  verifyCode: (sessionId: string, code: string) => Promise<void>;
+  /** Возвращает true, если у пользователя не указана дата рождения */
+  verifyCode: (sessionId: string, code: string) => Promise<boolean>;
   updateProfile: (data: UpdateProfileInput) => Promise<void>;
   logout: () => Promise<void>;
 }
@@ -45,7 +46,7 @@ export const useAuthStore = create<AuthState>((set) => ({
     return res.data;
   },
 
-  verifyCode: async (sessionId: string, code: string) => {
+  verifyCode: async (sessionId: string, code: string): Promise<boolean> => {
     const deviceId = await getDeviceId();
     const res = await authAPI.verifyCode(sessionId, code, deviceId);
     await storage.setTokens(res.data.access_token, res.data.refresh_token);
@@ -54,6 +55,8 @@ export const useAuthStore = create<AuthState>((set) => ({
     if (res.data.user.loyalty_balance !== undefined) {
       useLoyaltyStore.getState().setBalance(res.data.user.loyalty_balance);
     }
+    // Возвращаем true если дата рождения не указана — нужен onboarding-шаг
+    return !res.data.user.birth_date;
   },
 
   updateProfile: async (data: UpdateProfileInput) => {
