@@ -3,6 +3,7 @@ import { AppointmentDetailModal } from './AppointmentDetailModal';
 import { useBookingModalStore } from '@/store/useBookingModalStore';
 import { useEffect } from 'react';
 import { ConfirmModal } from './ConfirmModal';
+import { PrivacyPolicyModal } from './PrivacyPolicyModal';
 import { PromoModal } from './PromoModal';
 
 export type ModalType = 'booking' | 'confirm' | 'promo' | 'message' | 'appointment';
@@ -56,5 +57,5 @@ export function ModalRenderer({
   }
 }
 
-export { AppointmentDetailModal, ConfirmModal, MessageDetailModal, PromoModal };
+export { AppointmentDetailModal, ConfirmModal, MessageDetailModal, PrivacyPolicyModal, PromoModal };
 

@@ -23,4 +23,19 @@ export const styles = StyleSheet.create({
     marginBottom: 28,
     textAlign: 'center',
   },
+  checkboxContainer: {
+    marginTop: 4,
+    marginBottom: 20,
+  },
+  policyText: {
+    fontSize: 13,
+    fontFamily: FONT.regular,
+    color: COLORS.dark,
+    lineHeight: 18,
+  },
+  policyLink: {
+    fontFamily: FONT.medium,
+    color: '#1E4A78',
+    textDecorationLine: 'underline',
+  },
 });

@@ -1,0 +1,128 @@
+import { StyleSheet } from 'react-native';
+import { COLORS, FONT, RADIUS, SHADOW } from '@/constants/theme';
+
+export const styles = StyleSheet.create({
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(23, 41, 51, 0.65)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 32,
+  },
+  modalCard: {
+    width: '100%',
+    maxWidth: 500,
+    maxHeight: '90%',
+    backgroundColor: COLORS.white,
+    borderRadius: RADIUS.card,
+    paddingTop: 20,
+    paddingHorizontal: 20,
+    paddingBottom: 16,
+    ...SHADOW.medium,
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingBottom: 14,
+    borderBottomWidth: 1,
+    borderBottomColor: '#EEF2F6',
+  },
+  headerTitle: {
+    fontSize: 17,
+    fontFamily: FONT.medium,
+    color: COLORS.dark,
+    flex: 1,
+    paddingRight: 8,
+  },
+  closeBtn: {
+    padding: 6,
+    borderRadius: 20,
+    backgroundColor: '#F1F5F9',
+  },
+  browserLinkButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: COLORS.blueTint,
+    borderRadius: RADIUS.sm,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    marginVertical: 12,
+  },
+  browserLinkText: {
+    fontSize: 13,
+    fontFamily: FONT.medium,
+    color: COLORS.dark,
+    marginLeft: 8,
+  },
+  scrollView: {
+    marginVertical: 8,
+  },
+  scrollContent: {
+    paddingBottom: 12,
+  },
+  introBadge: {
+    backgroundColor: '#F8FAFC',
+    borderRadius: RADIUS.sm,
+    padding: 10,
+    marginBottom: 12,
+    borderLeftWidth: 3,
+    borderLeftColor: COLORS.blue,
+  },
+  introBadgeText: {
+    fontSize: 12,
+    fontFamily: FONT.regular,
+    color: COLORS.textSecondary,
+    lineHeight: 17,
+  },
+  sectionTitle: {
+    fontSize: 14,
+    fontFamily: FONT.medium,
+    color: COLORS.dark,
+    marginTop: 12,
+    marginBottom: 6,
+  },
+  paragraph: {
+    fontSize: 13,
+    fontFamily: FONT.regular,
+    color: '#334155',
+    lineHeight: 19,
+    marginBottom: 8,
+  },
+  bulletList: {
+    marginBottom: 8,
+    paddingLeft: 4,
+  },
+  bulletItem: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginBottom: 4,
+  },
+  bulletDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: COLORS.blue,
+    marginTop: 6,
+    marginRight: 8,
+  },
+  bulletText: {
+    flex: 1,
+    fontSize: 13,
+    fontFamily: FONT.regular,
+    color: '#334155',
+    lineHeight: 18,
+  },
+  footer: {
+    paddingTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: '#EEF2F6',
+    flexDirection: 'row',
+    gap: 10,
+  },
+  footerBtn: {
+    flex: 1,
+  },
+});

@@ -1,8 +1,11 @@
 import { Button } from '@/components/common/Button';
+import { Checkbox } from '@/components/common/Checkbox';
 import { Input } from '@/components/common/Input';
+import { PrivacyPolicyModal } from '@/components/modals/PrivacyPolicyModal';
 import { useAuthStore } from '@/store/useAuthStore';
 import { styles } from '@/styles/phone';
 import { formatPhoneInput, normalizePhone } from '@/utils/formatters';
+import { openPrivacyPolicy } from '@/utils/policy';
 import { isValidPhone } from '@/utils/validators';
 import { router } from 'expo-router';
 import { useState } from 'react';
@@ -11,13 +14,39 @@ import { Alert, Text, View } from 'react-native';
 export default function PhoneScreen() {
   const [phone, setPhone] = useState('+7');
   const [loading, setLoading] = useState(false);
+  const [policyAccepted, setPolicyAccepted] = useState(false);
+  const [policyError, setPolicyError] = useState<string | null>(null);
+  const [policyModalVisible, setPolicyModalVisible] = useState(false);
   const { requestCode } = useAuthStore();
+
+  const handleOpenPolicy = async () => {
+    await openPrivacyPolicy(() => {
+      setPolicyModalVisible(true);
+    });
+  };
+
+  const handleTogglePolicy = (checked: boolean) => {
+    setPolicyAccepted(checked);
+    if (checked) {
+      setPolicyError(null);
+    }
+  };
 
   const handleRequestCode = async () => {
     if (!isValidPhone(phone)) {
       Alert.alert('Ошибка', 'Введите корректный номер телефона');
       return;
     }
+
+    if (!policyAccepted) {
+      setPolicyError('Требуется согласие на обработку персональных данных');
+      Alert.alert(
+        'Требуется согласие',
+        'Перед продолжением необходимо ознакомиться и согласиться с Политикой обработки персональных данных (ФЗ-152).'
+      );
+      return;
+    }
+    setPolicyError(null);
 
     const normalized = normalizePhone(phone);
     setLoading(true);
@@ -76,10 +105,39 @@ export default function PhoneScreen() {
         maxLength={18}
       />
 
+      <Checkbox
+        checked={policyAccepted}
+        onToggle={handleTogglePolicy}
+        errorMessage={policyError ?? undefined}
+        style={styles.checkboxContainer}
+        label={
+          <Text style={styles.policyText}>
+            Я даю согласие на{' '}
+            <Text style={styles.policyLink} onPress={handleOpenPolicy}>
+              обработку персональных данных
+            </Text>{' '}
+            в соответствии с ФЗ-152 и принимаю{' '}
+            <Text style={styles.policyLink} onPress={handleOpenPolicy}>
+              Политику конфиденциальности
+            </Text>
+          </Text>
+        }
+      />
+
       <Button
         title={loading ? 'Отправка...' : 'Получить код'}
         onPress={handleRequestCode}
         loading={loading}
+      />
+
+      <PrivacyPolicyModal
+        visible={policyModalVisible}
+        onClose={() => setPolicyModalVisible(false)}
+        showAcceptButton={!policyAccepted}
+        onAccept={() => {
+          setPolicyAccepted(true);
+          setPolicyError(null);
+        }}
       />
     </View>
   );
