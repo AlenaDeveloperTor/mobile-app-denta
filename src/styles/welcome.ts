@@ -43,8 +43,13 @@ export const styles = StyleSheet.create({
   hint: {
     fontSize: 12,
     fontFamily: FONT.regular,
-    color: 'rgba(255,255,255,0.4)',
+    color: 'rgba(255,255,255,0.5)',
     textAlign: 'center',
     marginTop: 20,
+    lineHeight: 18,
+  },
+  hintLink: {
+    textDecorationLine: 'underline',
+    color: COLORS.blue,
   },
 });

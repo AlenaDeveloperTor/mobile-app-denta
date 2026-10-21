@@ -1,4 +1,5 @@
 import { pushAPI } from '@/api/push';
+import { EAS_PROJECT_ID } from '@/config/env';
 import { STORAGE_KEYS } from '@/utils/constants';
 import { getDeviceId } from '@/utils/device';
 import { storage } from '@/utils/storage';
@@ -155,7 +156,7 @@ async function registerForPushNotifications(): Promise<string | null> {
 
   const expoPushToken = (await Notifications.getExpoPushTokenAsync(
     {
-     projectId: 'c275c99b-f1f1-4842-b1f8-d8acb43ab83c',
+     projectId: EAS_PROJECT_ID,
   }
   )).data;
 

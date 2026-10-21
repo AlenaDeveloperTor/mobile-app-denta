@@ -1,8 +1,10 @@
 import { Button } from '@/components/common/Button';
+import { PrivacyPolicyModal } from '@/components/modals/PrivacyPolicyModal';
 import { useAppointmentStore } from '@/store/useAppointmentStore';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useLoyaltyStore } from '@/store/useLoyaltyStore';
 import { styles } from '@/styles/profile';
+import { openPrivacyPolicy } from '@/utils/policy';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router, useFocusEffect } from 'expo-router';
@@ -23,6 +25,13 @@ export default function ProfileScreen() {
   const [confirmVisible, setConfirmVisible] = useState(false);
   const [logoutError, setLogoutError] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
+  const [policyModalVisible, setPolicyModalVisible] = useState(false);
+
+  const handleOpenPolicy = async () => {
+    await openPrivacyPolicy(() => {
+      setPolicyModalVisible(true);
+    });
+  };
 
   // ── Редактирование профиля ─────────────────────────────────────────────
   const [editVisible, setEditVisible] = useState(false);
@@ -284,6 +293,15 @@ export default function ProfileScreen() {
           <Ionicons name="chevron-forward" size={20} color="#AAC6EE" />
         </TouchableOpacity>
 
+        <TouchableOpacity
+          style={styles.menuItem}
+          onPress={handleOpenPolicy}
+        >
+          <Ionicons name="shield-checkmark-outline" size={22} color="#AAC6EE" />
+          <Text style={styles.menuText}>Политика конфиденциальности</Text>
+          <Ionicons name="chevron-forward" size={20} color="#AAC6EE" />
+        </TouchableOpacity>
+
         <Button title="Выйти из аккаунта" variant="secondary" onPress={openLogoutConfirm} />
       </ScrollView>
 
@@ -311,6 +329,11 @@ export default function ProfileScreen() {
           </View>
         </View>
       )}
+
+      <PrivacyPolicyModal
+        visible={policyModalVisible}
+        onClose={() => setPolicyModalVisible(false)}
+      />
     </>
   );
 }
