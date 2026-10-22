@@ -4,6 +4,7 @@ import { useAppointmentStore } from '@/store/useAppointmentStore';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useLoyaltyStore } from '@/store/useLoyaltyStore';
 import { styles } from '@/styles/profile';
+import { formatDate, formatDateInput, parseDateInputToISO } from '@/utils/formatters';
 import { openPrivacyPolicy } from '@/utils/policy';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -39,6 +40,7 @@ export default function ProfileScreen() {
   const [lastName, setLastName] = useState('');
   const [patronymic, setPatronymic] = useState('');
   const [email, setEmail] = useState('');
+  const [birthDate, setBirthDate] = useState('');
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [focusedField, setFocusedField] = useState<string | null>(null);
@@ -49,6 +51,16 @@ export default function ProfileScreen() {
     setLastName(user?.last_name ?? '');
     setPatronymic(user?.patronymic ?? '');
     setEmail(user?.email ?? '');
+    if (user?.birth_date) {
+      const parts = user.birth_date.split('-');
+      if (parts.length === 3) {
+        setBirthDate(`${parts[2]}.${parts[1]}.${parts[0]}`);
+      } else {
+        setBirthDate(user.birth_date);
+      }
+    } else {
+      setBirthDate('');
+    }
     setSaveError(null);
     setEditVisible(true);
   };
@@ -56,17 +68,31 @@ export default function ProfileScreen() {
   const cancelEdit = () => {
     setEditVisible(false);
     setSaveError(null);
+    setBirthDate('');
   };
 
   const handleSave = async () => {
     setSaving(true);
     setSaveError(null);
+
+    let isoBirthDate: string | undefined = undefined;
+    if (birthDate.trim()) {
+      const parsed = parseDateInputToISO(birthDate);
+      if (!parsed) {
+        setSaveError('Введите корректную дату рождения (ДД.ММ.ГГГГ)');
+        setSaving(false);
+        return;
+      }
+      isoBirthDate = parsed;
+    }
+
     try {
       await updateProfile({
         first_name: firstName.trim() || undefined,
         last_name: lastName.trim() || undefined,
         patronymic: patronymic.trim() || undefined,
         email: email.trim() || undefined,
+        birth_date: isoBirthDate,
       });
       setEditVisible(false);
     } catch {
@@ -159,6 +185,16 @@ export default function ProfileScreen() {
         <Text style={styles.name}>{displayName || 'Профиль'}</Text>
         <Text style={styles.phone}>{user?.phone ?? ''}</Text>
 
+        {/* Дата рождения пользователя */}
+        {user?.birth_date ? (
+          <View style={styles.birthDateBadge}>
+            <Ionicons name="gift-outline" size={15} color="#64748B" />
+            <Text style={styles.birthDateText}>
+              {formatDate(user.birth_date)}
+            </Text>
+          </View>
+        ) : null}
+
         {/* Кнопка редактирования */}
         {!editVisible && (
           <TouchableOpacity style={styles.editProfileBtn} onPress={openEdit} activeOpacity={0.75}>
@@ -219,6 +255,19 @@ export default function ProfileScreen() {
               onBlur={() => setFocusedField(null)}
               keyboardType="email-address"
               autoCapitalize="none"
+            />
+
+            <Text style={styles.fieldLabel}>Дата рождения</Text>
+            <TextInput
+              style={[styles.fieldInput, focusedField === 'birthDate' && styles.fieldInputFocused]}
+              value={birthDate}
+              onChangeText={(text) => setBirthDate(formatDateInput(text))}
+              placeholder="ДД.ММ.ГГГГ"
+              placeholderTextColor="#B0BAC9"
+              onFocus={() => setFocusedField('birthDate')}
+              onBlur={() => setFocusedField(null)}
+              keyboardType="number-pad"
+              maxLength={10}
             />
 
             {saveError ? <Text style={styles.editFormError}>{saveError}</Text> : null}

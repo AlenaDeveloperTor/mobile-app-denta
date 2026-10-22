@@ -31,7 +31,18 @@ export const styles = StyleSheet.create({
     fontFamily: FONT.regular,
     color: COLORS.textSecondary,
     marginTop: 4,
-    marginBottom: 12,
+    marginBottom: 8,
+  },
+  birthDateBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginBottom: 14,
+  },
+  birthDateText: {
+    fontSize: 14,
+    fontFamily: FONT.regular,
+    color: COLORS.textSecondary,
   },
 
   // ── Кнопка редактировать профиль ──────────────────────────────────────

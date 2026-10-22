@@ -83,3 +83,42 @@ export function formatPhoneInput(input: string): string {
   return formatted;
 }
 
+/**
+ * Форматирует ввод даты по маске ДД.ММ.ГГГГ
+ * Примеры: "12051995" -> "12.05.1995"
+ */
+export function formatDateInput(input: string): string {
+  const digits = input.replace(/\D/g, '').slice(0, 8);
+  if (digits.length <= 2) return digits;
+  if (digits.length <= 4) return `${digits.slice(0, 2)}.${digits.slice(2)}`;
+  return `${digits.slice(0, 2)}.${digits.slice(2, 4)}.${digits.slice(4)}`;
+}
+
+/**
+ * Преобразует ввод ДД.ММ.ГГГГ в ISO YYYY-MM-DD с валидацией.
+ * Возвращает null, если дата некорректна.
+ */
+export function parseDateInputToISO(input: string): string | null {
+  const trimmed = input.trim();
+  if (!trimmed) return null;
+  const match = trimmed.match(/^(\d{2})\.(\d{2})\.(\d{4})$/);
+  if (!match) return null;
+  const day = parseInt(match[1], 10);
+  const month = parseInt(match[2], 10);
+  const year = parseInt(match[3], 10);
+  if (month < 1 || month > 12) return null;
+  if (day < 1 || day > 31) return null;
+  const currentYear = new Date().getFullYear();
+  if (year < 1900 || year > currentYear) return null;
+  const date = new Date(year, month - 1, day);
+  if (
+    date.getFullYear() !== year ||
+    date.getMonth() !== month - 1 ||
+    date.getDate() !== day
+  ) {
+    return null;
+  }
+  const pad = (n: number) => (n < 10 ? `0${n}` : `${n}`);
+  return `${year}-${pad(month)}-${pad(day)}`;
+}
+

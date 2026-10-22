@@ -34,7 +34,7 @@ export default function VerifyScreen() {
     try {
       const needsBirthDate = await verifyCode(session_id, code.trim());
       if (needsBirthDate) {
-        router.replace('/(auth)/birth-date');
+        router.replace('/(auth)/birth-date' as any);
       } else {
         router.replace('/(tabs)');
       }
