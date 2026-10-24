@@ -135,15 +135,48 @@ export const styles = StyleSheet.create({
     marginTop: 3,
   },
   loadingContainer: {
-    paddingVertical: 48,
+    paddingVertical: 56,
     alignItems: 'center',
+    justifyContent: 'center',
+  },
+  errorContainer: {
+    paddingVertical: 40,
+    paddingHorizontal: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  errorIcon: {
+    marginBottom: 12,
+  },
+  errorTitle: {
+    fontSize: 16,
+    fontFamily: FONT.medium,
+    color: COLORS.dark,
+    textAlign: 'center',
+    marginBottom: 6,
+  },
+  errorDescription: {
+    fontSize: 13,
+    fontFamily: FONT.regular,
+    color: COLORS.textSecondary,
+    textAlign: 'center',
+    marginBottom: 20,
+    lineHeight: 18,
+  },
+  retryButton: {
+    minWidth: 170,
+  },
+  emptyContainer: {
+    paddingVertical: 48,
+    paddingHorizontal: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   emptyText: {
     fontSize: 14,
     fontFamily: FONT.regular,
     color: COLORS.textSecondary,
     textAlign: 'center',
-    paddingVertical: 32,
   },
 
   // ─── Step 2: Form ──────────────────────────────────────────

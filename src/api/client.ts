@@ -108,6 +108,23 @@ export function getErrorMessage(
       if (typeof d.error === 'string' && d.error.trim()) {
         return d.error;
       }
+      // Ошибки валидации FastAPI / Pydantic (массив detail: [{ loc: [...], msg: "..." }])
+      if (Array.isArray(d.detail)) {
+        const messages = d.detail
+          .map((item: unknown) => {
+            if (typeof item === 'string') return item;
+            if (item && typeof item === 'object') {
+              const err = item as { loc?: (string | number)[]; msg?: string };
+              const field = Array.isArray(err.loc) ? err.loc[err.loc.length - 1] : '';
+              return field ? `${field}: ${err.msg}` : err.msg;
+            }
+            return String(item);
+          })
+          .filter(Boolean);
+        if (messages.length > 0) {
+          return messages.join('\n');
+        }
+      }
       if (typeof d.detail === 'string' && d.detail.trim()) {
         return d.detail;
       }

@@ -42,5 +42,6 @@ export interface Appointment {
 export interface CreateAppointmentInput {
   service_id: number;
   phone: string;
+  appointment_datetime?: string | null;
   comment?: string;
 }

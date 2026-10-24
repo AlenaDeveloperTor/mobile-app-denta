@@ -3,7 +3,6 @@ import { getErrorMessage } from '@/api/client';
 import { servicesAPI } from '@/api/services';
 import { Button } from '@/components/common/Button';
 import { Input } from '@/components/common/Input';
-import { DEFAULT_SERVICES } from '@/data/services';
 import { useAuthStore } from '@/store/useAuthStore';
 import {
     bookingBlurTargetRef,
@@ -16,7 +15,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import {
     ActivityIndicator,
     Alert,
@@ -49,6 +48,7 @@ export function BookingModal() {
 
   const [services, setServices] = useState<Service[]>([]);
   const [servicesLoading, setServicesLoading] = useState(false);
+  const [servicesError, setServicesError] = useState<string | null>(null);
   const [selectedService, setSelectedService] = useState<Service>();
   const [step, setStep] = useState<'service' | 'form'>('service');
   const [phone, setPhone] = useState('+7');
@@ -56,53 +56,54 @@ export function BookingModal() {
   const [submitting, setSubmitting] = useState(false);
   const [errors, setErrors] = useState<{ service?: string; phone?: string }>({});
 
-  // Загрузка списка услуг при первом открытии
-  useEffect(() => {
-    let active = true;
+  const loadServices = useCallback(async () => {
     setServicesLoading(true);
-    servicesAPI
-      .getServices()
-      .then((res) => {
-        if (!active) return;
-        // Если API вернул пустой список — показываем демо-услуги
-        const items = res.data.length > 0 ? res.data : DEFAULT_SERVICES;
-        setServices(items);
-        setSelectedService((prev) =>
-          prev ?? items.find((item) => item.id === initialServiceId)
-        );
-      })
-      .catch(() => {
-        // Если API недоступен — тоже показываем демо-услуги для теста
-        if (!active) return;
-        setServices(DEFAULT_SERVICES);
-        setSelectedService((prev) =>
-          prev ?? DEFAULT_SERVICES.find((item) => item.id === initialServiceId)
-        );
-      })
-      .finally(() => {
-        if (active) setServicesLoading(false);
-      });
-    return () => {
-      active = false;
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    setServicesError(null);
+    try {
+      const res = await servicesAPI.getServices();
+      const items = Array.isArray(res.data) ? res.data : [];
+      setServices(items);
+      return items;
+    } catch (error) {
+      const message = getErrorMessage(
+        error,
+        'Не удалось загрузить список услуг. Проверьте интернет-соединение.'
+      );
+      setServicesError(message);
+      setServices([]);
+      return [];
+    } finally {
+      setServicesLoading(false);
+    }
   }, []);
 
-  // Сброс формы при каждом открытии
+  // Загрузка услуг и сброс формы при каждом открытии
   useEffect(() => {
     if (!isOpen) return;
+
     setPhone(formatPhoneInput(user?.phone ?? ''));
     setComment('');
     setErrors({});
-    setSelectedService(services.find((service) => service.id === initialServiceId));
+    setSelectedService(undefined);
     setStep('service');
     stepAnimation.setValue(1);
-  }, [isOpen, initialServiceId, user?.phone]);
+
+    loadServices().then((items) => {
+      if (initialServiceId && items.length > 0) {
+        const found = items.find((item) => String(item.id) === String(initialServiceId));
+        if (found) {
+          setSelectedService(found);
+          setStep('form');
+        }
+      }
+    });
+  }, [isOpen, initialServiceId, user?.phone, loadServices]);
 
   const validate = () => {
     const next: typeof errors = {};
-    if (!selectedService) {
-      next.service = 'Выберите услугу';
+    const serviceIdNum = selectedService ? Number(selectedService.id) : NaN;
+    if (!selectedService || isNaN(serviceIdNum) || serviceIdNum <= 0) {
+      next.service = 'Выберите услугу из списка';
     }
     if (!isValidPhone(phone)) {
       next.phone = 'Укажите корректный номер телефона';
@@ -116,12 +117,18 @@ export function BookingModal() {
       return;
     }
 
+    const serviceIdNum = Number(selectedService.id);
+    if (isNaN(serviceIdNum) || serviceIdNum <= 0) {
+      Alert.alert('Ошибка', 'Некорректный идентификатор услуги. Пожалуйста, выберите услугу заново.');
+      return;
+    }
+
     setSubmitting(true);
     try {
       await appointmentsAPI.create({
-        service_id: Number(selectedService.id),
+        service_id: serviceIdNum,
         phone: normalizePhone(phone),
-        comment: comment.trim() || '',
+        comment: comment.trim() || undefined,
       });
       close();
       router.replace('/appointment-success');
@@ -219,13 +226,27 @@ export function BookingModal() {
                   <Text style={styles.label}>Выберите услугу</Text>
                   {servicesLoading ? (
                     <View style={styles.loadingContainer}>
-                      <ActivityIndicator color="#AAC6EE" />
+                      <ActivityIndicator size="large" color="#AAC6EE" />
+                    </View>
+                  ) : servicesError ? (
+                    <View style={styles.errorContainer}>
+                      <Ionicons
+                        name="cloud-offline-outline"
+                        size={44}
+                        color="#E57373"
+                        style={styles.errorIcon}
+                      />
+                      <Text style={styles.errorTitle}>Не удалось загрузить список услуг</Text>
+                      <Text style={styles.errorDescription}>{servicesError}</Text>
+                      <View style={styles.retryButton}>
+                        <Button title="Повторить попытку" onPress={loadServices} />
+                      </View>
                     </View>
                   ) : (
                     <FlatList
                       data={services}
                       numColumns={2}
-                      keyExtractor={(service) => service.id}
+                      keyExtractor={(service) => String(service.id)}
                       columnWrapperStyle={styles.gridRow}
                       contentContainerStyle={styles.serviceGrid}
                       showsVerticalScrollIndicator
@@ -254,7 +275,15 @@ export function BookingModal() {
                         </TouchableOpacity>
                       )}
                       ListEmptyComponent={
-                        <Text style={styles.emptyText}>Список услуг пока пуст</Text>
+                        <View style={styles.emptyContainer}>
+                          <Ionicons
+                            name="medical-outline"
+                            size={36}
+                            color="#A0AAB0"
+                            style={styles.errorIcon}
+                          />
+                          <Text style={styles.emptyText}>Список доступных услуг пока пуст</Text>
+                        </View>
                       }
                     />
                   )}
