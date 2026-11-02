@@ -1,16 +1,21 @@
+import { ErrorBoundary } from '@/components/common/ErrorBoundary';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
-import { FONT } from '@/constants/theme';
 import { BookingModal } from '@/components/modals/BookingModal';
+import { FONT } from '@/constants/theme';
 import { usePushNotifications } from '@/hooks/userPushNotifications';
 import { useAuthStore } from '@/store/useAuthStore';
 import { bookingBlurTargetRef } from '@/store/useBookingModalStore';
+import { initLogger, Sentry } from '@/utils/logger';
 import { BlurTargetView } from 'expo-blur';
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import { useEffect } from 'react';
 import { View } from 'react-native';
 
-export default function RootLayout() {
+// Инициализируем GlitchTip / Sentry до монтирования компонентов
+initLogger();
+
+function RootLayout() {
   const { isLoading, isAuthenticated, checkAuth } = useAuthStore();
 
   const [fontsLoaded] = useFonts({
@@ -29,31 +34,36 @@ export default function RootLayout() {
   }
 
   return (
-    <View style={{ flex: 1 }}>
-      {/* BlurTargetView нужен, чтобы BlurView в оверлее записи размывал экраны под собой (Android) */}
-      <BlurTargetView ref={bookingBlurTargetRef} style={{ flex: 1 }}>
-        <Stack screenOptions={{ headerShown: false }}>
-          <Stack.Protected guard={isAuthenticated}>
-            <Stack.Screen name="(tabs)" />
-            <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
-            <Stack.Screen name="appointment-success" />
-            <Stack.Screen
-              name="notifications"
-              options={{
-                headerShown: true,
-                title: 'Уведомления',
-                headerStyle: { backgroundColor: '#F5F8FC' },
-                headerTitleStyle: { fontFamily: FONT.medium, color: '#172933' },
-              }}
-            />
-          </Stack.Protected>
-          <Stack.Protected guard={!isAuthenticated}>
-            <Stack.Screen name="(auth)" />
-          </Stack.Protected>
-        </Stack>
-      </BlurTargetView>
-      {/* Глобальная модалка записи — поверх всех экранов */}
-      <BookingModal />
-    </View>
+    <ErrorBoundary>
+      <View style={{ flex: 1 }}>
+        {/* BlurTargetView нужен, чтобы BlurView в оверлее записи размывал экраны под собой (Android) */}
+        <BlurTargetView ref={bookingBlurTargetRef} style={{ flex: 1 }}>
+          <Stack screenOptions={{ headerShown: false }}>
+            <Stack.Protected guard={isAuthenticated}>
+              <Stack.Screen name="(tabs)" />
+              <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
+              <Stack.Screen name="appointment-success" />
+              <Stack.Screen
+                name="notifications"
+                options={{
+                  headerShown: true,
+                  title: 'Уведомления',
+                  headerStyle: { backgroundColor: '#F5F8FC' },
+                  headerTitleStyle: { fontFamily: FONT.medium, color: '#172933' },
+                }}
+              />
+            </Stack.Protected>
+            <Stack.Protected guard={!isAuthenticated}>
+              <Stack.Screen name="(auth)" />
+            </Stack.Protected>
+          </Stack>
+        </BlurTargetView>
+        {/* Глобальная модалка записи — поверх всех экранов */}
+        <BookingModal />
+      </View>
+    </ErrorBoundary>
   );
 }
+
+export default Sentry.wrap(RootLayout);
+

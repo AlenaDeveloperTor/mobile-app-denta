@@ -26,11 +26,7 @@ function BannerItem({ item }: BannerItemProps) {
           style={styles.bannerImage}
           resizeMode="cover"
           onError={(e) => {
-            console.warn('[BannerItem] Ошибка загрузки изображения:', item.image_url, e.nativeEvent.error);
             setImageError(true);
-          }}
-          onLoad={() => {
-            console.log('[BannerItem] Изображение загружено успешно:', item.image_url);
           }}
         />
       )}

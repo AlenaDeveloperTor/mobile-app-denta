@@ -290,6 +290,7 @@ export default function ProfileScreen() {
           </View>
         )}
 
+      
         {/* Карточка бонусного баланса */}
         <View style={styles.balanceCard}>
           <Ionicons name="gift-outline" size={26} color="#AAC6EE" />

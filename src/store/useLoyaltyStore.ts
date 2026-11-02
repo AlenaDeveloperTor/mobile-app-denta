@@ -1,4 +1,5 @@
-import { loyaltyAPI, type LoyaltyTransaction } from '@/api/loyalty';
+import { authAPI } from '@/api/auth';
+import type { LoyaltyTransaction } from '@/api/loyalty';
 import { create } from 'zustand';
 
 interface LoyaltyState {
@@ -19,14 +20,17 @@ export const useLoyaltyStore = create<LoyaltyState>((set) => ({
   fetchBalance: async () => {
     set({ loading: true, error: null });
     try {
-      const res = await loyaltyAPI.getBalance();
-      set({
-        balance: res.data.balance,
-        history: res.data.points_history,
-        loading: false,
-      });
+      const res = await authAPI.getProfile();
+      if (res.data.loyalty_balance !== undefined) {
+        set({
+          balance: res.data.loyalty_balance,
+          loading: false,
+        });
+      } else {
+        set({ loading: false });
+      }
     } catch {
-      set({ loading: false, error: 'Не удалось загрузить бонусы' });
+      set({ loading: false });
     }
   },
   setBalance: (balance) => set({ balance }),

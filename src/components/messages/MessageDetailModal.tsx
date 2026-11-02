@@ -49,8 +49,16 @@ export function MessageDetailModal({ messageId }: MessageDetailModalProps) {
     }
   }, [messages, messageId, markAsRead]);
 
+  const handleClose = () => {
+    if (router.canGoBack()) {
+      router.back();
+    } else {
+      router.replace('/notifications');
+    }
+  };
+
   const handleBannerPress = () => {
-    router.back(); // закрыть детальный просмотр
+    handleClose();
     if (message?.category === 'promo') {
       openBooking();
     }
@@ -61,7 +69,7 @@ export function MessageDetailModal({ messageId }: MessageDetailModalProps) {
       <View style={styles.modalContainer}>
         <View style={styles.modalContent}>
           <Text style={styles.notFound}>Сообщение не найдено</Text>
-          <Button title="Закрыть" variant="secondary" onPress={() => router.back()} />
+          <Button title="Закрыть" variant="secondary" onPress={handleClose} />
         </View>
       </View>
     );
@@ -77,7 +85,7 @@ export function MessageDetailModal({ messageId }: MessageDetailModalProps) {
             <View style={styles.categoryBadge}>
               <Text style={styles.categoryText}>{CATEGORY_LABELS[message.category]}</Text>
             </View>
-            <TouchableOpacity onPress={() => router.back()} style={styles.closeButton} hitSlop={10}>
+            <TouchableOpacity onPress={handleClose} style={styles.closeButton} hitSlop={10}>
               <Ionicons name="close" size={24} color="#666" />
             </TouchableOpacity>
           </View>
@@ -108,7 +116,7 @@ export function MessageDetailModal({ messageId }: MessageDetailModalProps) {
           {message.banner?.button_text ? (
             <Button title={message.banner.button_text} onPress={handleBannerPress} />
           ) : (
-            <Button title="Закрыть" variant="secondary" onPress={() => router.back()} />
+            <Button title="Закрыть" variant="secondary" onPress={handleClose} />
           )}
         </ScrollView>
       </View>

@@ -2,6 +2,7 @@ import { authAPI } from '@/api/auth';
 import { setUnauthorizedHandler } from '@/api/client';
 import type { CodeRequestResponse, UpdateProfileInput, User } from '@/types/user';
 import { getDeviceId } from '@/utils/device';
+import { setLoggerUser } from '@/utils/logger';
 import { storage } from '@/utils/storage';
 import { create } from 'zustand';
 import { useLoyaltyStore } from './useLoyaltyStore';
@@ -29,6 +30,12 @@ export const useAuthStore = create<AuthState>((set) => ({
       if (token) {
         const res = await authAPI.getProfile();
         set({ user: res.data, isAuthenticated: true });
+        setLoggerUser({
+          id: res.data.id,
+          phone: res.data.phone,
+          username: [res.data.first_name, res.data.last_name].filter(Boolean).join(' ') || undefined,
+          email: res.data.email,
+        });
         // Синхронизируем баланс бонусов при проверке авторизации
         if (res.data.loyalty_balance !== undefined) {
           useLoyaltyStore.getState().setBalance(res.data.loyalty_balance);
@@ -36,6 +43,7 @@ export const useAuthStore = create<AuthState>((set) => ({
       }
     } catch {
       await storage.removeTokens();
+      setLoggerUser(null);
     } finally {
       set({ isLoading: false });
     }
@@ -51,6 +59,12 @@ export const useAuthStore = create<AuthState>((set) => ({
     const res = await authAPI.verifyCode(sessionId, code, deviceId);
     await storage.setTokens(res.data.access_token, res.data.refresh_token);
     set({ user: res.data.user, isAuthenticated: true });
+    setLoggerUser({
+      id: res.data.user.id,
+      phone: res.data.user.phone,
+      username: [res.data.user.first_name, res.data.user.last_name].filter(Boolean).join(' ') || undefined,
+      email: res.data.user.email,
+    });
     // Синхронизируем баланс бонусов после верификации кода
     if (res.data.user.loyalty_balance !== undefined) {
       useLoyaltyStore.getState().setBalance(res.data.user.loyalty_balance);
@@ -62,6 +76,12 @@ export const useAuthStore = create<AuthState>((set) => ({
   updateProfile: async (data: UpdateProfileInput) => {
     const res = await authAPI.updateProfile(data);
     set({ user: res.data });
+    setLoggerUser({
+      id: res.data.id,
+      phone: res.data.phone,
+      username: [res.data.first_name, res.data.last_name].filter(Boolean).join(' ') || undefined,
+      email: res.data.email,
+    });
     // Синхронизируем баланс бонусов при обновлении профиля
     if (res.data.loyalty_balance !== undefined) {
       useLoyaltyStore.getState().setBalance(res.data.loyalty_balance);
@@ -70,6 +90,7 @@ export const useAuthStore = create<AuthState>((set) => ({
 
   logout: async () => {
     await storage.removeTokens();
+    setLoggerUser(null);
     set({ user: null, isAuthenticated: false });
   },
 }));
@@ -77,5 +98,6 @@ export const useAuthStore = create<AuthState>((set) => ({
 // При получении 401 от API сбрасываем сессию
 setUnauthorizedHandler(() => {
   storage.removeTokens();
+  setLoggerUser(null);
   useAuthStore.setState({ user: null, isAuthenticated: false });
 });

@@ -14,7 +14,7 @@ export function ConfirmModal({ message, onConfirm }: ConfirmModalProps) {
 
   const handleConfirm = async () => {
     if (!onConfirm) {
-      router.back();
+      if (router.canGoBack()) { router.back(); } else { router.replace('/(tabs)'); }
       return;
     }
     setSubmitting(true);
@@ -37,7 +37,7 @@ export function ConfirmModal({ message, onConfirm }: ConfirmModalProps) {
           <Button
             title="Отмена"
             variant="secondary"
-            onPress={() => router.back()}
+            onPress={() => { if (router.canGoBack()) { router.back(); } else { router.replace('/(tabs)'); } }}
             style={styles.confirmButton}
           />
           <Button

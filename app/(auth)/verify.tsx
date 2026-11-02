@@ -73,7 +73,7 @@ export default function VerifyScreen() {
         onPress={handleVerify}
         loading={loading}
       />
-      <Button title="Назад" variant="secondary" onPress={() => router.back()} />
+      <Button title="Назад" variant="secondary" onPress={() => { if (router.canGoBack()) { router.back(); } else { router.replace('/(auth)/phone'); } }} />
     </View>
   );
 }

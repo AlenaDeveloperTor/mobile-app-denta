@@ -30,6 +30,14 @@ export function AppointmentDetailModal({ appointmentId }: AppointmentDetailModal
 	);
 
 	const [appointment, setAppointment] = useState<Appointment | null>(foundInStore ?? null);
+
+	const handleClose = () => {
+		if (router.canGoBack()) {
+			router.back();
+		} else {
+			router.replace('/(tabs)/appointments');
+		}
+	};
 	const [loading, setLoading] = useState(!foundInStore);
 	const [error, setError] = useState(false);
 
@@ -93,7 +101,7 @@ export function AppointmentDetailModal({ appointmentId }: AppointmentDetailModal
 			<View style={styles.modalContainer}>
 				<View style={styles.modalContent}>
 					<Text style={styles.notFound}>Не удалось загрузить запись</Text>
-					<Button title="Закрыть" variant="secondary" onPress={() => router.back()} />
+					<Button title="Закрыть" variant="secondary" onPress={handleClose} />
 				</View>
 			</View>
 		);
@@ -112,7 +120,7 @@ export function AppointmentDetailModal({ appointmentId }: AppointmentDetailModal
 			<View style={styles.modalContent}>
 				<View style={styles.header}>
 					<Text style={styles.title}>Детали записи</Text>
-					<TouchableOpacity onPress={() => router.back()} style={styles.closeButton} hitSlop={10}>
+					<TouchableOpacity onPress={handleClose} style={styles.closeButton} hitSlop={10}>
 						<Ionicons name="close" size={24} color="#666" />
 					</TouchableOpacity>
 				</View>
@@ -133,7 +141,7 @@ export function AppointmentDetailModal({ appointmentId }: AppointmentDetailModal
 							<Text style={styles.value}>{appointment.comment}</Text>
 						</View>
 					) : null}
-					<Button title="Закрыть" variant="secondary" onPress={() => router.back()} />
+					<Button title="Закрыть" variant="secondary" onPress={handleClose} />
 				</ScrollView>
 			</View>
 		</View>

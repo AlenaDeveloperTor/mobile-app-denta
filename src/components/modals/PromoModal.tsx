@@ -33,7 +33,7 @@ export function PromoModal({ promoId }: PromoModalProps) {
   const openBooking = useBookingModalStore((s) => s.open);
 
   const handleBook = () => {
-    router.back(); // закрываем модалку акции
+    if (router.canGoBack()) { router.back(); } else { router.replace('/(tabs)'); } // закрываем модалку акции
     openBooking(); // открываем глобальную модалку записи
   };
 
@@ -45,7 +45,7 @@ export function PromoModal({ promoId }: PromoModalProps) {
         <Text style={styles.promoDescription}>{promo.description}</Text>
 
         <Button title="Записаться" onPress={handleBook} />
-        <Button title="Закрыть" variant="secondary" onPress={() => router.back()} />
+        <Button title="Закрыть" variant="secondary" onPress={() => { if (router.canGoBack()) { router.back(); } else { router.replace('/(tabs)'); } }} />
       </View>
     </View>
   );

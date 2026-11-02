@@ -1,4 +1,5 @@
 import { API_URL } from '@/config/env';
+import { captureException } from '@/utils/logger';
 import { storage } from '@/utils/storage';
 import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
 
@@ -82,6 +83,28 @@ api.interceptors.response.use(
       await storage.removeTokens();
       unauthorizedHandler?.();
     }
+
+    // Логируем в GlitchTip критические ошибки: 5xx бэкенда или сбои сети (offline/timeout)
+    const status = error.response?.status;
+    if (!status || status >= 500) {
+      captureException(error, {
+        tags: {
+          error_type: 'api_error',
+          endpoint: error.config?.url || 'unknown',
+          method: error.config?.method?.toUpperCase() || 'unknown',
+          status: status ? String(status) : 'NETWORK_ERROR',
+        },
+        extra: {
+          url: error.config?.url,
+          baseURL: error.config?.baseURL,
+          params: error.config?.params,
+          status,
+          responseData: error.response?.data,
+          message: error.message,
+        },
+      });
+    }
+
     return Promise.reject(error);
   }
 );
