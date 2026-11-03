@@ -10,6 +10,34 @@ import * as Notifications from 'expo-notifications';
 import { router } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
 import { Platform } from 'react-native';
+import { z } from 'zod';
+
+const pushBannerSchema = z.object({
+  image_url: z.string().optional(),
+  image: z.string().optional(),
+  title: z.string().optional(),
+  subtitle: z.string().optional(),
+  button_text: z.string().optional(),
+  bg_color: z.string().optional(),
+});
+
+const pushPayloadSchema = z.object({
+  id: z.union([z.string(), z.number()]).optional(),
+  messageId: z.union([z.string(), z.number()]).optional(),
+  message_id: z.union([z.string(), z.number()]).optional(),
+  title: z.string().optional(),
+  body: z.string().optional(),
+  category: z.enum(['promo', 'info', 'system']).optional(),
+  image_url: z.string().optional(),
+  imageUrl: z.string().optional(),
+  image: z.string().optional(),
+  picture: z.string().optional(),
+  banner_url: z.string().optional(),
+  banner: z.union([z.string(), pushBannerSchema]).optional(),
+  richContent: z.object({
+    image: z.string().optional(),
+  }).optional(),
+}).passthrough();
 
 if (Platform.OS !== 'web') {
   Notifications.setNotificationHandler({
@@ -82,52 +110,56 @@ function handleNotificationResponse(
 
 function addNotificationToStore(notification: Notifications.Notification): string {
   const content = notification.request.content;
-  const data = content.data as Record<string, unknown> | undefined;
-  const hasServerId = data?.messageId ?? data?.message_id ?? data?.id;
-  const messageId = hasServerId ?? `local:${notification.request.identifier}`;
-  const title = typeof data?.title === 'string' ? data.title : content.title;
-  const body = typeof data?.body === 'string' ? data.body : content.body;
+  const parsed = pushPayloadSchema.safeParse(content.data ?? {});
+  const data = parsed.success ? parsed.data : {};
+
+  const hasServerId = data.messageId ?? data.message_id ?? data.id;
+  const messageId = hasServerId ? String(hasServerId) : `local:${notification.request.identifier}`;
+  const title = (typeof data.title === 'string' && data.title) || content.title;
+  const body = (typeof data.body === 'string' && data.body) || content.body;
   if (!title || !body) return String(messageId);
 
-  const category = data?.category;
+  const category = data.category;
   const store = useMessageStore.getState();
   if (store.messages.some((message) => String(message.id) === String(messageId))) return String(messageId);
 
-  const richContent = data?.richContent as Record<string, unknown> | undefined;
-  const rawBanner = (typeof data?.banner === 'string'
-    ? (() => {
-        try {
-          return JSON.parse(data.banner as string);
-        } catch {
-          return undefined;
-        }
-      })()
-    : data?.banner) as Record<string, unknown> | undefined;
+  let rawBanner: z.infer<typeof pushBannerSchema> | undefined;
+  if (typeof data.banner === 'string') {
+    try {
+      const json = JSON.parse(data.banner);
+      const bannerParsed = pushBannerSchema.safeParse(json);
+      if (bannerParsed.success) rawBanner = bannerParsed.data;
+    } catch {
+      // Игнорируем ошибку JSON-парсинга
+    }
+  } else if (data.banner && typeof data.banner === 'object') {
+    rawBanner = data.banner;
+  }
 
   const rawAttachments = (content as Record<string, unknown>).attachments;
-  const attachmentUrl = Array.isArray(rawAttachments) && rawAttachments[0]?.url
-    ? (rawAttachments[0].url as string)
+  const attachmentUrl = Array.isArray(rawAttachments) && typeof rawAttachments[0]?.url === 'string'
+    ? rawAttachments[0].url
     : undefined;
 
   const imageUrl =
     rawBanner?.image_url ??
     rawBanner?.image ??
-    data?.image_url ??
-    data?.imageUrl ??
-    data?.image ??
-    data?.picture ??
-    data?.banner_url ??
-    richContent?.image ??
+    data.image_url ??
+    data.imageUrl ??
+    data.image ??
+    data.picture ??
+    data.banner_url ??
+    data.richContent?.image ??
     attachmentUrl;
 
   const bannerObj =
-    (typeof imageUrl === 'string' && imageUrl) || rawBanner
+    imageUrl || rawBanner
       ? {
-          image_url: typeof imageUrl === 'string' ? imageUrl : undefined,
-          title: typeof rawBanner?.title === 'string' ? rawBanner.title : undefined,
-          subtitle: typeof rawBanner?.subtitle === 'string' ? rawBanner.subtitle : undefined,
-          button_text: typeof rawBanner?.button_text === 'string' ? rawBanner.button_text : undefined,
-          bg_color: typeof rawBanner?.bg_color === 'string' ? rawBanner.bg_color : undefined,
+          image_url: imageUrl,
+          title: rawBanner?.title,
+          subtitle: rawBanner?.subtitle,
+          button_text: rawBanner?.button_text,
+          bg_color: rawBanner?.bg_color,
         }
       : undefined;
 
@@ -136,7 +168,7 @@ function addNotificationToStore(notification: Notifications.Notification): strin
     category: category === 'promo' || category === 'info' ? category : ('system' as MessageCategory),
     title,
     body,
-    image_url: typeof imageUrl === 'string' ? imageUrl : undefined,
+    image_url: imageUrl,
     banner: bannerObj,
     is_read: false,
     created_at: new Date().toISOString(),
