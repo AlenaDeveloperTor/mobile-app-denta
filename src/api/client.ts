@@ -12,7 +12,7 @@ export const api = axios.create({
 });
 
 // Реестр обработчика на 401 — регистрируется из приложения/стора (без циклических зависимостей)
-type UnauthorizedHandler = () => void;
+type UnauthorizedHandler = () => void | Promise<void>;
 let unauthorizedHandler: UnauthorizedHandler | null = null;
 
 export function setUnauthorizedHandler(handler: UnauthorizedHandler | null): void {
@@ -99,7 +99,7 @@ api.interceptors.response.use(
           baseURL: error.config?.baseURL,
           params: error.config?.params,
           status,
-          responseData: error.response?.data,
+
           message: error.message,
         },
       });

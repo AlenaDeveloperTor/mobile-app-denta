@@ -33,7 +33,12 @@ export function usePushNotifications(enabled = true) {
       return;
     }
 
-    registerForPushNotifications().then(setExpoPushToken);
+    registerForPushNotifications()
+      .then(setExpoPushToken)
+      .catch((err) => {
+        // Ошибка регистрации push (симулятор, отказ в правах или отсутствие сети)
+        console.warn('Не удалось зарегистрировать push-уведомления:', err);
+      });
 
     const notificationListener = Notifications.addNotificationReceivedListener((n) => {
       setNotification(n);
@@ -43,7 +48,7 @@ export function usePushNotifications(enabled = true) {
       handleNotificationResponse(response, handledResponseIds.current);
     });
 
-    Notifications.getLastNotificationResponseAsync().then(response => {
+    Notifications.getLastNotificationResponseAsync().catch(() => null).then(response => {
       if (response) {
         handleNotificationResponse(response, handledResponseIds.current);
       }

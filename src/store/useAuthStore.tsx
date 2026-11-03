@@ -32,7 +32,7 @@ export const useAuthStore = create<AuthState>((set) => ({
         set({ user: res.data, isAuthenticated: true });
         setLoggerUser({
           id: res.data.id,
-          phone: res.data.phone,
+
           username: [res.data.first_name, res.data.last_name].filter(Boolean).join(' ') || undefined,
           email: res.data.email,
         });
@@ -61,7 +61,7 @@ export const useAuthStore = create<AuthState>((set) => ({
     set({ user: res.data.user, isAuthenticated: true });
     setLoggerUser({
       id: res.data.user.id,
-      phone: res.data.user.phone,
+
       username: [res.data.user.first_name, res.data.user.last_name].filter(Boolean).join(' ') || undefined,
       email: res.data.user.email,
     });
@@ -78,7 +78,7 @@ export const useAuthStore = create<AuthState>((set) => ({
     set({ user: res.data });
     setLoggerUser({
       id: res.data.id,
-      phone: res.data.phone,
+
       username: [res.data.first_name, res.data.last_name].filter(Boolean).join(' ') || undefined,
       email: res.data.email,
     });
@@ -96,8 +96,8 @@ export const useAuthStore = create<AuthState>((set) => ({
 }));
 
 // При получении 401 от API сбрасываем сессию
-setUnauthorizedHandler(() => {
-  storage.removeTokens();
+setUnauthorizedHandler(async () => {
+  await storage.removeTokens();
   setLoggerUser(null);
   useAuthStore.setState({ user: null, isAuthenticated: false });
 });

@@ -128,7 +128,6 @@ export function addBreadcrumb(breadcrumb: {
  */
 export function setLoggerUser(user: {
   id: string | number;
-  phone?: string;
   username?: string;
   email?: string;
 } | null): void {
