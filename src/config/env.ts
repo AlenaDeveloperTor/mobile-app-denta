@@ -1,3 +1,4 @@
+
 import {
   API_URL as envApiUrl,
   MAX_BOT_DEEP_LINK as envMaxBotDeepLink,
@@ -16,18 +17,20 @@ export const MAX_BOT_DEEP_LINK =
 
 /** Ссылка на политику обработки персональных данных (152-ФЗ) */
 export const PRIVACY_POLICY_URL =
-  envPrivacyPolicyUrl || 'https://api.clinic.com/v1/privacy-policy';
+  envPrivacyPolicyUrl ||
+  process.env.EXPO_PUBLIC_PRIVACY_POLICY_URL ||
+  'https://labsmile22.ru/privaci';
 
 /**
  * Firebase Cloud Messaging Sender ID.
  * Берётся из google-services.json → project_number.
  * Обязателен для работы push-уведомлений на Android.
  */
-export const FCM_SENDER_ID = envFcmSenderId || '';
+export const FCM_SENDER_ID = envFcmSenderId || '877661775122';
 
 /**
  * EAS Project ID для получения Expo Push Token.
- * Берётся из eas.json / app.json → extra.eas.projectId.
+ * Берётся из @env, либо из app.json (extra.eas.projectId).
  */
 export const EAS_PROJECT_ID = envEasProjectId || '';
 

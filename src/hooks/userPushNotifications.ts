@@ -42,6 +42,7 @@ const pushPayloadSchema = z.object({
 if (Platform.OS !== 'web') {
   Notifications.setNotificationHandler({
     handleNotification: async () => ({
+      shouldShowAlert: true,
       shouldShowBanner: true,
       shouldShowList: true,
       shouldPlaySound: true,
@@ -191,24 +192,33 @@ async function registerForPushNotifications(): Promise<string | null> {
     return null;
   }
 
-  const expoPushToken = (await Notifications.getExpoPushTokenAsync(
-    {
-     projectId: EAS_PROJECT_ID,
-  }
-  )).data;
-
   if (Platform.OS === 'android') {
     await Notifications.setNotificationChannelAsync('default', {
       name: 'default',
       importance: Notifications.AndroidImportance.MAX,
+      vibrationPattern: [0, 250, 250, 250],
+      lightColor: '#AAC6EE',
     });
   }
+
+  const expoPushToken = (
+    await Notifications.getExpoPushTokenAsync({
+      projectId: EAS_PROJECT_ID,
+    })
+  ).data;
+
+
 
   await storage.setItem(STORAGE_KEYS.EXPO_PUSH_TOKEN, expoPushToken);
 
   const deviceId = await getDeviceId();
   await pushAPI
     .registerToken(deviceId, expoPushToken, Platform.OS === 'ios' ? 'ios' : 'android')
-    .catch(() => {});
+    .then(() => {
+      console.log('[Push] Токен успешно зарегистрирован на сервере');
+    })
+    .catch((err) => {
+      console.error('[Push] Ошибка регистрации токена на сервере:', err);
+    });
   return expoPushToken;
 }

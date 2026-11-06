@@ -23,4 +23,10 @@ export const styles = StyleSheet.create({
     marginBottom: 28,
     textAlign: 'center',
   },
+  submitButton: {
+    marginBottom: 12,
+  },
+  backButton: {
+    marginTop: 0,
+  },
 });
