@@ -6,7 +6,7 @@ import { formatDateTime } from '@/utils/formatters';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { Image, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { Image, Modal, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { styles } from './MessageDetailModal.styles';
 
 const CATEGORY_LABELS: Record<MessageCategory, string> = {
@@ -30,6 +30,7 @@ export function MessageDetailModal({ messageId }: MessageDetailModalProps) {
   const openBooking = useBookingModalStore((s) => s.open);
   const [message, setMessage] = useState<Message | undefined>();
   const [imageFailed, setImageFailed] = useState(false);
+  const [bannerExpanded, setBannerExpanded] = useState(false);
 
   useEffect(() => {
     // Бэкенд возвращает id как integer, URL-параметр — строка.
@@ -94,11 +95,16 @@ export function MessageDetailModal({ messageId }: MessageDetailModalProps) {
           <Text style={styles.date}>{formatDateTime(message.created_at)}</Text>
 
           {bannerImageUrl ? (
-            <View
+            <TouchableOpacity
               style={[
                 styles.bannerWrap,
                 { backgroundColor: message.banner?.bg_color ?? '#007AFF' },
               ]}
+              onPress={() => setBannerExpanded(true)}
+              disabled={imageFailed}
+              activeOpacity={0.9}
+              accessibilityRole="button"
+              accessibilityLabel="Открыть баннер в полном размере"
             >
               {!imageFailed && (
                 <Image
@@ -108,7 +114,7 @@ export function MessageDetailModal({ messageId }: MessageDetailModalProps) {
                   onError={() => setImageFailed(true)}
                 />
               )}
-            </View>
+            </TouchableOpacity>
           ) : null}
 
           <Text style={styles.body}>{message.body}</Text>
@@ -120,6 +126,42 @@ export function MessageDetailModal({ messageId }: MessageDetailModalProps) {
           )}
         </ScrollView>
       </View>
+      <Modal
+        visible={bannerExpanded && !imageFailed}
+        transparent
+        animationType="fade"
+        statusBarTranslucent
+        onRequestClose={() => setBannerExpanded(false)}
+      >
+        <View style={styles.expandedBannerBackdrop}>
+          <TouchableOpacity
+            style={styles.expandedBannerDismissArea}
+            onPress={() => setBannerExpanded(false)}
+            activeOpacity={1}
+            accessibilityRole="button"
+            accessibilityLabel="Закрыть увеличенный баннер"
+          >
+            <Image
+              source={{ uri: bannerImageUrl }}
+              style={styles.expandedBannerImage}
+              resizeMode="contain"
+              onError={() => {
+                setImageFailed(true);
+                setBannerExpanded(false);
+              }}
+            />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.expandedBannerCloseButton}
+            onPress={() => setBannerExpanded(false)}
+            hitSlop={10}
+            accessibilityRole="button"
+            accessibilityLabel="Закрыть баннер"
+          >
+            <Ionicons name="close" size={28} color="#fff" />
+          </TouchableOpacity>
+        </View>
+      </Modal>
     </View>
   );
 }

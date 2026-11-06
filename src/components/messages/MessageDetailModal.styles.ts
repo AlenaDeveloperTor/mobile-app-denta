@@ -60,6 +60,30 @@ export const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
   },
+  expandedBannerBackdrop: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.96)',
+  },
+  expandedBannerDismissArea: {
+    width: '100%',
+    height: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  expandedBannerImage: {
+    width: '100%',
+    height: '100%',
+  },
+  expandedBannerCloseButton: {
+    position: 'absolute',
+    top: 48,
+    right: 20,
+    padding: 8,
+    borderRadius: RADIUS.pill,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
   body: {
     fontSize: 15,
     fontFamily: FONT.regular,
