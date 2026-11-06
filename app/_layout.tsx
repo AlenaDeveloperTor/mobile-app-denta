@@ -1,5 +1,5 @@
 import { ErrorBoundary } from '@/components/common/ErrorBoundary';
-import { LoadingSpinner } from '@/components/common/LoadingSpinner';
+import { StartupSplash } from '@/components/common/StartupSplash';
 import { BookingModal } from '@/components/modals/BookingModal';
 import { FONT } from '@/constants/theme';
 import { usePushNotifications } from '@/hooks/userPushNotifications';
@@ -9,14 +9,20 @@ import { initLogger, Sentry } from '@/utils/logger';
 import { BlurTargetView } from 'expo-blur';
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
-import { useEffect } from 'react';
+import * as SplashScreen from 'expo-splash-screen';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { View } from 'react-native';
 
 // Инициализируем GlitchTip / Sentry до монтирования компонентов
 initLogger();
 
+void SplashScreen.preventAutoHideAsync();
+SplashScreen.setOptions({ duration: 350, fade: true });
+
 function RootLayout() {
   const { isLoading, isAuthenticated, checkAuth } = useAuthStore();
+  const [startupAnimationComplete, setStartupAnimationComplete] = useState(false);
+  const nativeSplashHidden = useRef(false);
 
   const [fontsLoaded] = useFonts({
     'Montserrat-Medium': require('../assets/fonts/Montserrat-Medium.ttf'),
@@ -29,8 +35,27 @@ function RootLayout() {
     checkAuth(); // Проверяем, есть ли сохраненный токен
   }, [checkAuth]);
 
-  if (isLoading || !fontsLoaded) {
-    return <LoadingSpinner />;
+  const hideNativeSplash = useCallback(() => {
+    if (nativeSplashHidden.current) {
+      return;
+    }
+
+    nativeSplashHidden.current = true;
+    SplashScreen.hide();
+  }, []);
+
+  const completeStartupAnimation = useCallback(() => {
+    setStartupAnimationComplete(true);
+  }, []);
+
+  if (isLoading || !fontsLoaded || !startupAnimationComplete) {
+    return (
+      <StartupSplash
+        fontsLoaded={fontsLoaded}
+        onAnimationComplete={completeStartupAnimation}
+        onLayout={hideNativeSplash}
+      />
+    );
   }
 
   return (
@@ -66,4 +91,3 @@ function RootLayout() {
 }
 
 export default Sentry.wrap(RootLayout);
-
