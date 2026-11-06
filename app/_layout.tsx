@@ -1,5 +1,5 @@
 import { ErrorBoundary } from '@/components/common/ErrorBoundary';
-import { LoadingSpinner } from '@/components/common/LoadingSpinner';
+import { StartupSplash } from '@/components/common/StartupSplash';
 import { BookingModal } from '@/components/modals/BookingModal';
 import { FONT } from '@/constants/theme';
 import { usePushNotifications } from '@/hooks/userPushNotifications';
@@ -9,14 +9,19 @@ import { initLogger, Sentry } from '@/utils/logger';
 import { BlurTargetView } from 'expo-blur';
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
-import { useEffect } from 'react';
+import * as SplashScreen from 'expo-splash-screen';
+import { useCallback, useEffect, useRef } from 'react';
 import { View } from 'react-native';
 
 // Инициализируем GlitchTip / Sentry до монтирования компонентов
 initLogger();
 
+void SplashScreen.preventAutoHideAsync();
+SplashScreen.setOptions({ duration: 180, fade: true });
+
 function RootLayout() {
   const { isLoading, isAuthenticated, checkAuth } = useAuthStore();
+  const nativeSplashHidden = useRef(false);
 
   const [fontsLoaded] = useFonts({
     'Montserrat-Medium': require('../assets/fonts/Montserrat-Medium.ttf'),
@@ -29,8 +34,17 @@ function RootLayout() {
     checkAuth(); // Проверяем, есть ли сохраненный токен
   }, [checkAuth]);
 
+  const hideNativeSplash = useCallback(() => {
+    if (nativeSplashHidden.current) {
+      return;
+    }
+
+    nativeSplashHidden.current = true;
+    SplashScreen.hide();
+  }, []);
+
   if (isLoading || !fontsLoaded) {
-    return <LoadingSpinner />;
+    return <StartupSplash onLayout={hideNativeSplash} />;
   }
 
   return (
@@ -66,4 +80,3 @@ function RootLayout() {
 }
 
 export default Sentry.wrap(RootLayout);
-

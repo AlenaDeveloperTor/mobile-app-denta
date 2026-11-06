@@ -12,7 +12,7 @@
     },
     "android": {
       "predictiveBackGestureEnabled": false,
-      "package": "com.romchik_programmist.mobileappdenta",
+      "package": "com.labsmile22.denta",
       "googleServicesFile": "./google-services.json",
        "adaptiveIcon": {
         "foregroundImage": "./assets/images/logo.png",
@@ -26,6 +26,14 @@
     "plugins": [
       "expo-router",
       "expo-secure-store",
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#F5F8FC",
+          "image": "./assets/images/splash-logo.png",
+          "imageWidth": 250
+        }
+      ],
       [
         "expo-notifications",
         {
