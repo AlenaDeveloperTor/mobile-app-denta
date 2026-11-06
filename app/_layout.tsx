@@ -10,18 +10,20 @@ import { BlurTargetView } from 'expo-blur';
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
-import { useCallback, useEffect, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import { View } from 'react-native';
 
 // Инициализируем GlitchTip / Sentry до монтирования компонентов
 initLogger();
 
+// Удерживаем нативный сплэш до монтирования JS-компонента
 void SplashScreen.preventAutoHideAsync();
 SplashScreen.setOptions({ duration: 180, fade: true });
 
 function RootLayout() {
   const { isLoading, isAuthenticated, checkAuth } = useAuthStore();
-  const nativeSplashHidden = useRef(false);
+  const [splashVisible, setSplashVisible] = useState(true);
+  const [safetyTimeoutReached, setSafetyTimeoutReached] = useState(false);
 
   const [fontsLoaded] = useFonts({
     'Montserrat-Medium': require('../assets/fonts/Montserrat-Medium.ttf'),
@@ -30,21 +32,35 @@ function RootLayout() {
   });
 
   usePushNotifications(isAuthenticated);
+
   useEffect(() => {
     checkAuth(); // Проверяем, есть ли сохраненный токен
   }, [checkAuth]);
 
-  const hideNativeSplash = useCallback(() => {
-    if (nativeSplashHidden.current) {
-      return;
-    }
-
-    nativeSplashHidden.current = true;
-    SplashScreen.hide();
+  // Гарантированное скрытие системного нативного сплэша
+  useEffect(() => {
+    void SplashScreen.hideAsync().catch(() => {});
+    const timer = setTimeout(() => {
+      void SplashScreen.hideAsync().catch(() => {});
+    }, 1200);
+    return () => clearTimeout(timer);
   }, []);
 
-  if (isLoading || !fontsLoaded) {
-    return <StartupSplash onLayout={hideNativeSplash} />;
+  // Страховочный таймер: максимум 2.6 секунды на сплэш,
+  // чтобы приложение НИКОГДА не зависло, даже если сервер не отвечает или нет сети
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setSafetyTimeoutReached(true);
+    }, 2600);
+    return () => clearTimeout(timer);
+  }, []);
+
+  const isAppReady = (!isLoading && fontsLoaded) || safetyTimeoutReached;
+
+  // Если шрифты еще не загрузились и страховочный таймаут не вышел,
+  // рендерим сплэш без монтирования экранов с текстом
+  if (!fontsLoaded && !safetyTimeoutReached) {
+    return <StartupSplash isReady={false} />;
   }
 
   return (
@@ -72,8 +88,17 @@ function RootLayout() {
             </Stack.Protected>
           </Stack>
         </BlurTargetView>
+
         {/* Глобальная модалка записи — поверх всех экранов */}
         <BookingModal />
+
+        {/* Анимированный сплэш поверх основного контента с плавным растворением */}
+        {splashVisible && (
+          <StartupSplash
+            isReady={isAppReady}
+            onFinish={() => setSplashVisible(false)}
+          />
+        )}
       </View>
     </ErrorBoundary>
   );
