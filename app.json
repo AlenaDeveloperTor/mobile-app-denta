@@ -12,7 +12,7 @@
     },
     "android": {
       "predictiveBackGestureEnabled": false,
-      "package": "com.romchik_programmist.mobileappdenta",
+      "package": "com.labsmile22.denta",
       "googleServicesFile": "./google-services.json",
        "adaptiveIcon": {
         "foregroundImage": "./assets/images/logo.png",
@@ -30,8 +30,8 @@
         "expo-splash-screen",
         {
           "backgroundColor": "#F5F8FC",
-          "image": "./assets/images/logo.png",
-          "imageWidth": 144
+          "image": "./assets/images/splash-logo.png",
+          "imageWidth": 250
         }
       ],
       [

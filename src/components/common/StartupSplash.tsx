@@ -1,100 +1,78 @@
-import { FONT, COLORS } from '@/constants/theme';
+import { COLORS } from '@/constants/theme';
 import { useEffect, useRef } from 'react';
-import { Animated, Image, StyleSheet, Text, View } from 'react-native';
+import { Animated, Image, StyleSheet, View } from 'react-native';
 
 interface StartupSplashProps {
-  fontsLoaded: boolean;
-  onAnimationComplete: () => void;
   onLayout: () => void;
 }
 
-export function StartupSplash({
-  fontsLoaded,
-  onAnimationComplete,
-  onLayout,
-}: StartupSplashProps) {
-  const logoOpacity = useRef(new Animated.Value(0)).current;
-  const logoScale = useRef(new Animated.Value(0.82)).current;
-  const textOpacity = useRef(new Animated.Value(0)).current;
-  const textOffset = useRef(new Animated.Value(10)).current;
+export function StartupSplash({ onLayout }: StartupSplashProps) {
+  const firstRingScale = useRef(new Animated.Value(0.68)).current;
+  const firstRingOpacity = useRef(new Animated.Value(0.35)).current;
+  const secondRingScale = useRef(new Animated.Value(0.68)).current;
+  const secondRingOpacity = useRef(new Animated.Value(0.35)).current;
 
   useEffect(() => {
-    const animation = Animated.parallel([
-      Animated.sequence([
-        Animated.delay(100),
+    const createPulse = (scale: Animated.Value, opacity: Animated.Value) =>
+      Animated.loop(
         Animated.parallel([
-          Animated.spring(logoScale, {
-            toValue: 1,
-            speed: 14,
-            bounciness: 8,
+          Animated.timing(scale, {
+            toValue: 1.35,
+            duration: 1800,
             useNativeDriver: true,
           }),
-          Animated.timing(logoOpacity, {
-            toValue: 1,
-            duration: 450,
-            useNativeDriver: true,
-          }),
-        ]),
-      ]),
-      Animated.sequence([
-        Animated.delay(300),
-        Animated.parallel([
-          Animated.timing(textOpacity, {
-            toValue: 1,
-            duration: 450,
-            useNativeDriver: true,
-          }),
-          Animated.timing(textOffset, {
+          Animated.timing(opacity, {
             toValue: 0,
-            duration: 450,
+            duration: 1800,
             useNativeDriver: true,
           }),
         ]),
-      ]),
+        { resetBeforeIteration: true },
+      );
+
+    const firstPulse = createPulse(firstRingScale, firstRingOpacity);
+    const secondPulse = Animated.sequence([
+      Animated.delay(900),
+      createPulse(secondRingScale, secondRingOpacity),
     ]);
 
-    animation.start(({ finished }) => {
-      if (finished) {
-        onAnimationComplete();
-      }
-    });
+    firstPulse.start();
+    secondPulse.start();
 
-    return () => animation.stop();
-  }, [logoOpacity, logoScale, onAnimationComplete, textOffset, textOpacity]);
+    return () => {
+      firstPulse.stop();
+      secondPulse.stop();
+    };
+  }, [firstRingOpacity, firstRingScale, secondRingOpacity, secondRingScale]);
 
   return (
     <View style={styles.container} onLayout={onLayout} accessible accessibilityLabel="LabSmile">
-      <Animated.View
-        style={[
-          styles.logo,
-          {
-            opacity: logoOpacity,
-            transform: [{ scale: logoScale }],
-          },
-        ]}
-      >
+      <View style={styles.logo}>
+        <Animated.View
+          style={[
+            styles.ring,
+            {
+              opacity: firstRingOpacity,
+              transform: [{ scale: firstRingScale }],
+            },
+          ]}
+        />
+        <Animated.View
+          style={[
+            styles.ring,
+            {
+              opacity: secondRingOpacity,
+              transform: [{ scale: secondRingScale }],
+            },
+          ]}
+        />
         <Image
-          source={require('../../../assets/images/logo.png')}
+          source={require('../../../assets/images/splash-logo.png')}
           style={styles.logoImage}
           resizeMode="contain"
           accessibilityLabel="Логотип клиники LabSmile"
         />
-      </Animated.View>
-
-      <Animated.View
-        style={[
-          styles.brand,
-          {
-            opacity: textOpacity,
-            transform: [{ translateY: textOffset }],
-          },
-        ]}
-      >
-        <Text style={[styles.name, !fontsLoaded && styles.fallbackFont]}>LabSmile</Text>
-        <Text style={[styles.tagline, !fontsLoaded && styles.fallbackFont]}>
-          Вклад в качество жизни
-        </Text>
-      </Animated.View>
+      </View>
     </View>
   );
 }
@@ -107,32 +85,23 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.background,
   },
   logo: {
-    width: 144,
-    height: 144,
-    borderRadius: 32,
-    overflow: 'hidden',
+    width: 250,
+    height: 169,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   logoImage: {
     width: '100%',
     height: '100%',
   },
-  brand: {
-    alignItems: 'center',
-    marginTop: 24,
-  },
-  name: {
-    color: COLORS.dark,
-    fontFamily: FONT.medium,
-    fontSize: 26,
-    letterSpacing: 0.6,
-  },
-  tagline: {
-    color: COLORS.textSecondary,
-    fontFamily: FONT.regular,
-    fontSize: 13,
-    marginTop: 8,
-  },
-  fallbackFont: {
-    fontFamily: undefined,
+  ring: {
+    position: 'absolute',
+    top: 17,
+    left: 80,
+    width: 90,
+    height: 90,
+    borderRadius: 45,
+    borderWidth: 1.5,
+    borderColor: COLORS.blue,
   },
 });

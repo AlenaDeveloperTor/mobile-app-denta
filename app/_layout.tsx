@@ -10,18 +10,17 @@ import { BlurTargetView } from 'expo-blur';
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { View } from 'react-native';
 
 // Инициализируем GlitchTip / Sentry до монтирования компонентов
 initLogger();
 
 void SplashScreen.preventAutoHideAsync();
-SplashScreen.setOptions({ duration: 350, fade: true });
+SplashScreen.setOptions({ duration: 180, fade: true });
 
 function RootLayout() {
   const { isLoading, isAuthenticated, checkAuth } = useAuthStore();
-  const [startupAnimationComplete, setStartupAnimationComplete] = useState(false);
   const nativeSplashHidden = useRef(false);
 
   const [fontsLoaded] = useFonts({
@@ -44,18 +43,8 @@ function RootLayout() {
     SplashScreen.hide();
   }, []);
 
-  const completeStartupAnimation = useCallback(() => {
-    setStartupAnimationComplete(true);
-  }, []);
-
-  if (isLoading || !fontsLoaded || !startupAnimationComplete) {
-    return (
-      <StartupSplash
-        fontsLoaded={fontsLoaded}
-        onAnimationComplete={completeStartupAnimation}
-        onLayout={hideNativeSplash}
-      />
-    );
+  if (isLoading || !fontsLoaded) {
+    return <StartupSplash onLayout={hideNativeSplash} />;
   }
 
   return (
