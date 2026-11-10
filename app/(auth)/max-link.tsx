@@ -6,13 +6,17 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { Linking, Text, View } from 'react-native';
 
 export default function MaxLinkScreen() {
-  const { phone, deep_link, session_id } = useLocalSearchParams<{
+  const { phone, session_id } = useLocalSearchParams<{
     phone?: string;
     deep_link?: string;
     session_id?: string;
   }>();
-  // Ссылка от сервера, либо запасная из .env
-  const botLink = deep_link && deep_link.length > 0 ? deep_link : MAX_BOT_DEEP_LINK;
+  // Всегда используем бота из .env (MAX_BOT_DEEP_LINK) — он гарантированно правильный.
+  // session_id добавляем как ?start= чтобы бот знал сессию и отправил код нужному пользователю.
+  // deep_link от сервера намеренно игнорируем — там может быть устаревший/тестовый бот.
+  const botLink = session_id
+    ? `${MAX_BOT_DEEP_LINK}?start=${session_id}`
+    : MAX_BOT_DEEP_LINK;
 
   const openBot = async () => {
     if (!botLink) {

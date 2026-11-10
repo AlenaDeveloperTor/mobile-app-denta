@@ -6,7 +6,7 @@ import { styles } from './Button.styles';
 interface ButtonProps {
   title: string;
   onPress: () => void;
-  variant?: 'primary' | 'secondary';
+  variant?: 'primary' | 'secondary' | 'danger';
   disabled?: boolean;
   loading?: boolean;
   style?: StyleProp<ViewStyle>;
@@ -42,6 +42,23 @@ export const Button = ({
             <Text style={styles.text}>{title}</Text>
           )}
         </LinearGradient>
+      </TouchableOpacity>
+    );
+  }
+
+  if (variant === 'danger') {
+    return (
+      <TouchableOpacity
+        style={[styles.button, styles.danger, isDisabled && styles.disabled, style]}
+        onPress={onPress}
+        disabled={isDisabled}
+        activeOpacity={0.85}
+      >
+        {loading ? (
+          <ActivityIndicator color="#fff" />
+        ) : (
+          <Text style={[styles.text, styles.dangerText]}>{title}</Text>
+        )}
       </TouchableOpacity>
     );
   }

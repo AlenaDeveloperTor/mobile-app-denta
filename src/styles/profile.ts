@@ -10,15 +10,51 @@ export const styles = StyleSheet.create({
     padding: 20,
     alignItems: 'center',
   },
+  avatarWrapper: {
+    position: 'relative',
+    marginTop: 20,
+    marginBottom: 14,
+  },
   avatar: {
     width: 88,
     height: 88,
     borderRadius: 44,
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: 20,
-    marginBottom: 14,
     overflow: 'hidden',
+    backgroundColor: COLORS.white,
+  },
+  avatarImage: {
+    width: 88,
+    height: 88,
+    borderRadius: 44,
+  },
+  avatarGradient: {
+    width: 88,
+    height: 88,
+    borderRadius: 44,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  avatarPlaceholder: {
+    width: 88,
+    height: 88,
+    borderRadius: 44,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  avatarBadge: {
+    position: 'absolute',
+    bottom: 0,
+    right: 0,
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: COLORS.dark,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 2,
+    borderColor: COLORS.white,
   },
   name: {
     fontSize: 22,
@@ -275,19 +311,34 @@ export const styles = StyleSheet.create({
   confirmButton: {
     flex: 1,
   },
-  // ── Удаление аккаунта ──────────────────────────────────────────────────
-  deleteAccountBtn: {
-    marginTop: 8,
-    marginBottom: 32,
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    alignSelf: 'center',
+  // ── Дополнительно (аккордеон) ─────────────────────────────────────────
+  advancedToggle: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginTop: 20,
+    marginBottom: 8,
+    paddingVertical: 6,
+    paddingHorizontal: 12,
   },
-  deleteAccountBtnText: {
+  advancedToggleText: {
     fontSize: 13,
     fontFamily: FONT.regular,
-    color: COLORS.error,
-    textDecorationLine: 'underline',
+    color: COLORS.textSecondary,
+  },
+  advancedContent: {
+    alignItems: 'center',
+    paddingTop: 6,
+    paddingBottom: 32,
+  },
+  versionText: {
+    fontSize: 12,
+    fontFamily: FONT.regular,
+    color: COLORS.textSecondary,
+    marginBottom: 14,
+  },
+  compactDeleteBtn: {
+    minWidth: 190,
   },
   deleteConfirmBtn: {
     backgroundColor: COLORS.error,

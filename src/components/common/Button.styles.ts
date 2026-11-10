@@ -45,4 +45,19 @@ export const styles = StyleSheet.create({
     color: COLORS.dark,
     fontFamily: FONT.medium,
   },
+  /** Danger — сплошной красный фон */
+  danger: {
+    minHeight: 48,
+    paddingVertical: 10,
+    paddingHorizontal: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexDirection: 'row',
+    borderRadius: RADIUS.pill,
+    backgroundColor: COLORS.error,
+  },
+  dangerText: {
+    color: COLORS.white,
+    fontFamily: FONT.medium,
+  },
 });

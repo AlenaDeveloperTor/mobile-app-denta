@@ -1,3 +1,4 @@
+import { Platform } from 'react-native';
 import type { AuthResponse, CodeRequestResponse, TokenPair, UpdateProfileInput, User } from '@/types/user';
 import { api } from './client';
 
@@ -25,4 +26,13 @@ export const authAPI = {
    * Безвозвратно удаляет учётную запись, сессии, токены и персональные данные.
    */
   deleteAccount: () => api.delete<string>('/users/me'),
+
+  /** Загрузить фото профиля (аватарку) */
+  uploadAvatar: (formData: FormData) =>
+    api.post<User>('/users/me/avatar', formData, {
+      headers: {
+        'Content-Type': Platform.OS === 'web' ? undefined : 'multipart/form-data',
+      },
+      transformRequest: (data) => data,
+    }),
 };

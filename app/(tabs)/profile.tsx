@@ -1,5 +1,6 @@
 import { Button } from '@/components/common/Button';
 import { PrivacyPolicyModal } from '@/components/modals/PrivacyPolicyModal';
+import { API_URL } from '@/config/env';
 import { useAppointmentStore } from '@/store/useAppointmentStore';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useLoyaltyStore } from '@/store/useLoyaltyStore';
@@ -7,10 +8,15 @@ import { styles } from '@/styles/profile';
 import { formatDate, formatDateInput, parseDateInputToISO } from '@/utils/formatters';
 import { openPrivacyPolicy } from '@/utils/policy';
 import { Ionicons } from '@expo/vector-icons';
+import * as ImagePicker from 'expo-image-picker';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router, useFocusEffect } from 'expo-router';
 import React, { useEffect, useState, useCallback } from 'react';
 import {
+  ActivityIndicator,
+  Alert,
+  Image,
+  Platform,
   RefreshControl,
   ScrollView,
   Text,
@@ -19,8 +25,15 @@ import {
   View,
 } from 'react-native';
 
+function getFullAvatarUrl(url?: string | null): string | null {
+  if (!url) return null;
+  if (url.startsWith('http://') || url.startsWith('https://')) return url;
+  const baseUrl = API_URL.replace(/\/api\/?$/, '');
+  return `${baseUrl}${url.startsWith('/') ? '' : '/'}${url}`;
+}
+
 export default function ProfileScreen() {
-  const { user, logout, updateProfile, deleteAccount } = useAuthStore();
+  const { user, logout, updateProfile, deleteAccount, uploadAvatar } = useAuthStore();
   const { balance, history, fetchBalance, setBalance } = useLoyaltyStore();
   const [loggingOut, setLoggingOut] = useState(false);
   const [confirmVisible, setConfirmVisible] = useState(false);
@@ -28,8 +41,62 @@ export default function ProfileScreen() {
   const [deleteConfirmVisible, setDeleteConfirmVisible] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [advancedOpen, setAdvancedOpen] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [policyModalVisible, setPolicyModalVisible] = useState(false);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
+
+  const handlePickAvatar = async () => {
+    try {
+      const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (!permission.granted) {
+        Alert.alert(
+          'Доступ к фото',
+          'Пожалуйста, разрешите доступ к галерее в настройках телефона, чтобы выбрать фото.'
+        );
+        return;
+      }
+
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ['images'],
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 0.8,
+      });
+
+      if (result.canceled || !result.assets || result.assets.length === 0) {
+        return;
+      }
+
+      const asset = result.assets[0];
+      const filename = asset.fileName || asset.uri.split('/').pop() || 'avatar.jpg';
+      const match = /\.(\w+)$/.exec(filename);
+      const mimeType = asset.mimeType || (match ? `image/${match[1]}` : 'image/jpeg');
+
+      const formData = new FormData();
+      if (Platform.OS === 'web') {
+        // В браузере (Expo Web) нужен реальный Blob
+        const res = await fetch(asset.uri);
+        const blob = await res.blob();
+        formData.append('file', blob, filename);
+      } else {
+        // На нативном Android/iOS
+        formData.append('file', {
+          uri: asset.uri,
+          name: filename,
+          type: mimeType,
+        } as any);
+      }
+
+      setUploadingAvatar(true);
+      await uploadAvatar(formData);
+    } catch (error) {
+      console.error('Ошибка при загрузке фото:', error);
+      Alert.alert('Ошибка', 'Не удалось загрузить фото профиля. Попробуйте ещё раз.');
+    } finally {
+      setUploadingAvatar(false);
+    }
+  };
 
   const handleOpenPolicy = async () => {
     await openPrivacyPolicy(() => {
@@ -185,8 +252,9 @@ export default function ProfileScreen() {
     }
   };
 
-  // ── Отображаемое имя ───────────────────────────────────────────────────
+  // ── Отображаемое имя и аватарка ─────────────────────────────────────────
   const displayName = [user?.first_name, user?.last_name].filter(Boolean).join(' ');
+  const avatarUrl = getFullAvatarUrl(user?.avatar_url);
 
   return (
     <>
@@ -195,17 +263,35 @@ export default function ProfileScreen() {
         contentContainerStyle={styles.content}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
       >
-        {/* Аватар с градиентом */}
-        <View style={styles.avatar}>
-          <LinearGradient
-            colors={['#AAC6EE', '#D0C8B5']}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            style={{ width: 88, height: 88, alignItems: 'center', justifyContent: 'center', borderRadius: 44 }}
-          >
-            <Ionicons name="person" size={42} color="#172933" />
-          </LinearGradient>
-        </View>
+        {/* Аватар с возможностью выбора фото */}
+        <TouchableOpacity
+          style={styles.avatarWrapper}
+          onPress={handlePickAvatar}
+          disabled={uploadingAvatar}
+          activeOpacity={0.8}
+        >
+          <View style={styles.avatar}>
+            {uploadingAvatar ? (
+              <View style={styles.avatarPlaceholder}>
+                <ActivityIndicator size="small" color="#172933" />
+              </View>
+            ) : avatarUrl ? (
+              <Image source={{ uri: avatarUrl }} style={styles.avatarImage} />
+            ) : (
+              <LinearGradient
+                colors={['#AAC6EE', '#D0C8B5']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={styles.avatarGradient}
+              >
+                <Ionicons name="person" size={42} color="#172933" />
+              </LinearGradient>
+            )}
+          </View>
+          <View style={styles.avatarBadge}>
+            <Ionicons name="camera" size={14} color="#FFFFFF" />
+          </View>
+        </TouchableOpacity>
 
         <Text style={styles.name}>{displayName || 'Профиль'}</Text>
         <Text style={styles.phone}>{user?.phone ?? ''}</Text>
@@ -379,10 +465,31 @@ export default function ProfileScreen() {
 
         <Button title="Выйти из аккаунта" variant="secondary" onPress={openLogoutConfirm} />
 
-        {/* Удаление аккаунта (требование Google Play) */}
-        <TouchableOpacity style={styles.deleteAccountBtn} onPress={openDeleteConfirm} activeOpacity={0.7}>
-          <Text style={styles.deleteAccountBtnText}>Удалить аккаунт</Text>
+        {/* Раздел Дополнительно с шевроном */}
+        <TouchableOpacity
+          style={styles.advancedToggle}
+          onPress={() => setAdvancedOpen((prev) => !prev)}
+          activeOpacity={0.7}
+        >
+          <Text style={styles.advancedToggleText}>Дополнительно</Text>
+          <Ionicons
+            name={advancedOpen ? 'chevron-up' : 'chevron-down'}
+            size={16}
+            color="#6B7A8F"
+          />
         </TouchableOpacity>
+
+        {advancedOpen && (
+          <View style={styles.advancedContent}>
+            <Text style={styles.versionText}>Версия 1.0.0</Text>
+            <Button
+              title="Удалить аккаунт"
+              variant="danger"
+              onPress={openDeleteConfirm}
+              style={styles.compactDeleteBtn}
+            />
+          </View>
+        )}
       </ScrollView>
 
       {confirmVisible && (
