@@ -19,4 +19,10 @@ export const authAPI = {
 
   /** Обновить профиль текущего пользователя */
   updateProfile: (data: UpdateProfileInput) => api.patch<User>('/users/me', data),
+
+  /**
+   * Удалить аккаунт и все связанные данные (Google Play Account Deletion).
+   * Безвозвратно удаляет учётную запись, сессии, токены и персональные данные.
+   */
+  deleteAccount: () => api.delete<string>('/users/me'),
 };

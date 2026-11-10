@@ -20,11 +20,14 @@ import {
 } from 'react-native';
 
 export default function ProfileScreen() {
-  const { user, logout, updateProfile } = useAuthStore();
+  const { user, logout, updateProfile, deleteAccount } = useAuthStore();
   const { balance, history, fetchBalance, setBalance } = useLoyaltyStore();
   const [loggingOut, setLoggingOut] = useState(false);
   const [confirmVisible, setConfirmVisible] = useState(false);
   const [logoutError, setLogoutError] = useState<string | null>(null);
+  const [deleteConfirmVisible, setDeleteConfirmVisible] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
   const [policyModalVisible, setPolicyModalVisible] = useState(false);
 
@@ -157,6 +160,28 @@ export default function ProfileScreen() {
       setLogoutError('Не удалось выйти из аккаунта. Попробуйте ещё раз.');
     } finally {
       setLoggingOut(false);
+    }
+  };
+
+  // ── Удаление аккаунта ──────────────────────────────────────────────────
+  const openDeleteConfirm = () => {
+    setDeleteError(null);
+    setDeleteConfirmVisible(true);
+  };
+
+  const handleDeleteAccount = async () => {
+    setDeleting(true);
+    setDeleteError(null);
+    try {
+      useLoyaltyStore.getState().clear();
+      useAppointmentStore.getState().clear();
+      await deleteAccount();
+      setDeleteConfirmVisible(false);
+      router.replace('/(auth)/phone');
+    } catch {
+      setDeleteError('Не удалось удалить аккаунт. Попробуйте ещё раз.');
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -353,6 +378,11 @@ export default function ProfileScreen() {
         </TouchableOpacity>
 
         <Button title="Выйти из аккаунта" variant="secondary" onPress={openLogoutConfirm} />
+
+        {/* Удаление аккаунта (требование Google Play) */}
+        <TouchableOpacity style={styles.deleteAccountBtn} onPress={openDeleteConfirm} activeOpacity={0.7}>
+          <Text style={styles.deleteAccountBtnText}>Удалить аккаунт</Text>
+        </TouchableOpacity>
       </ScrollView>
 
       {confirmVisible && (
@@ -384,6 +414,34 @@ export default function ProfileScreen() {
         visible={policyModalVisible}
         onClose={() => setPolicyModalVisible(false)}
       />
+
+      {/* Модалка подтверждения удаления аккаунта */}
+      {deleteConfirmVisible && (
+        <View style={styles.confirmOverlay}>
+          <View style={styles.confirmCard}>
+            <Text style={styles.confirmTitle}>Удалить аккаунт?</Text>
+            <Text style={styles.confirmText}>
+              Это действие необратимо. Все ваши данные, история записей и бонусный баланс будут безвозвратно удалены.
+            </Text>
+            {deleteError ? <Text style={styles.confirmError}>{deleteError}</Text> : null}
+            <View style={styles.confirmButtons}>
+              <Button
+                title="Отмена"
+                variant="secondary"
+                onPress={() => setDeleteConfirmVisible(false)}
+                style={styles.confirmButton}
+                disabled={deleting}
+              />
+              <Button
+                title="Удалить"
+                onPress={handleDeleteAccount}
+                loading={deleting}
+                style={[styles.confirmButton, styles.deleteConfirmBtn]}
+              />
+            </View>
+          </View>
+        </View>
+      )}
     </>
   );
 }

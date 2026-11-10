@@ -275,4 +275,21 @@ export const styles = StyleSheet.create({
   confirmButton: {
     flex: 1,
   },
+  // ── Удаление аккаунта ──────────────────────────────────────────────────
+  deleteAccountBtn: {
+    marginTop: 8,
+    marginBottom: 32,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    alignSelf: 'center',
+  },
+  deleteAccountBtnText: {
+    fontSize: 13,
+    fontFamily: FONT.regular,
+    color: COLORS.error,
+    textDecorationLine: 'underline',
+  },
+  deleteConfirmBtn: {
+    backgroundColor: COLORS.error,
+  },
 });

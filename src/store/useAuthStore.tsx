@@ -16,6 +16,8 @@ interface AuthState {
   /** Возвращает true, если у пользователя не указана дата рождения */
   verifyCode: (sessionId: string, code: string) => Promise<boolean>;
   updateProfile: (data: UpdateProfileInput) => Promise<void>;
+  /** Безвозвратно удаляет аккаунт и все связанные данные (Google Play Account Deletion) */
+  deleteAccount: () => Promise<void>;
   logout: () => Promise<void>;
 }
 
@@ -86,6 +88,13 @@ export const useAuthStore = create<AuthState>((set) => ({
     if (res.data.loyalty_balance !== undefined) {
       useLoyaltyStore.getState().setBalance(res.data.loyalty_balance);
     }
+  },
+
+  deleteAccount: async () => {
+    await authAPI.deleteAccount();
+    await storage.removeTokens();
+    setLoggerUser(null);
+    set({ user: null, isAuthenticated: false });
   },
 
   logout: async () => {
